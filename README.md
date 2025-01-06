@@ -7,9 +7,10 @@ This project provides an interactive platform for users to view and analyze thei
 ---
 
 ## Features
-
-### 1. Dashboard
+### 1. Login
   ![Select Social Media Platform](1.jpg)
+### 2. Dashboard
+  ![Engagement Metrics](2.jpg)
 - **Select Social Media Platform**: Choose from available platforms such as Instagram, Twitter, Facebook to view platform-specific statistics.
 
 
@@ -24,8 +25,8 @@ This project provides an interactive platform for users to view and analyze thei
 
 ---
 
-### 2. Analytics
-  ![Engagement Metrics](2.jpg)
+### 3. Analytics
+  ![Scheduled Reports](3.jpg)
 - **View Engagement Metrics**: Track and view engagement metrics such as likes, comments, shares, and overall engagement rate for the selected platform.
 
 - **Analyze Follower Trends**: Visualize follower growth over time through interactive graphs and detailed data points.
@@ -35,8 +36,8 @@ This project provides an interactive platform for users to view and analyze thei
 
 ---
 
-### 3. Enhanced Flexibilities
-  ![Scheduled Reports](3.jpg)
+### 4. Enhanced Flexibilities
+
 - **Scheduled Reports**: Schedule periodic reports (daily, weekly, or monthly) in PDF or CSV format, sent to a specified email address.
 
 - **Dark Mode Option**: Toggle between light and dark modes for a better visual experience.
