@@ -1,70 +1,46 @@
-# Getting Started with Create React App
+# Social Media Dashboard Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+This project provides an interactive platform for users to view and analyze their social media accounts from different platforms (such as Instagram, Twitter, Facebook) through a dynamic dashboard. The application allows users to track engagement metrics, analyze follower growth, compare timeframes, schedule periodic reports, toggle dark mode, and switch between multiple languages. It provides enhanced flexibilities like multi-device login and supports syncing data from social media platforms.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## Features
+### 1. Login
+  ![Select Social Media Platform](1.jpg)
+### 2. Dashboard
+  ![Engagement Metrics](2.jpg)
+- **Select Social Media Platform**: Choose from available platforms such as Instagram, Twitter, Facebook to view platform-specific statistics.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **View Platform-Specific Statistics**: Displays metrics such as follower count, engagement rate, and recent activity for the selected platform.
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Sync Data**: Fetch the latest data from the selected platform and refresh the dashboard for real-time updates.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Logout**: Securely log out from the platform to ensure account privacy.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+### 3. Analytics
+  ![Scheduled Reports](3.jpg)
+- **View Engagement Metrics**: Track and view engagement metrics such as likes, comments, shares, and overall engagement rate for the selected platform.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- **Analyze Follower Trends**: Visualize follower growth over time through interactive graphs and detailed data points.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Compare Timeframes**: Compare metrics between two different timeframes using tabular or graphical formats.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+### 4. Enhanced Flexibilities
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **Scheduled Reports**: Schedule periodic reports (daily, weekly, or monthly) in PDF or CSV format, sent to a specified email address.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- **Dark Mode Option**: Toggle between light and dark modes for a better visual experience.
 
-### Code Splitting
+- **Multi-Language Support**: Select and apply preferred languages for the app interface for personalized user experience.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
