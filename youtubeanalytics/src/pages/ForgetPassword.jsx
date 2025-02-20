@@ -1,17 +1,26 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../config/firebase"; // Ensure correct path
+import { sendPasswordResetEmail } from "firebase/auth";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleReset = (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
-    if (email) {
-      alert(`Password reset link sent to ${email}`);
-      navigate("/login"); // Redirect to login after submission
-    } else {
+    if (!email) {
       alert("Please enter your email");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMessage("Password reset link sent! Check your email.");
+      setTimeout(() => navigate("/login"), 3000); // Redirect after 3 seconds
+    } catch (error) {
+      alert(error.message); // Show Firebase error message
     }
   };
 
@@ -19,6 +28,7 @@ const ForgotPassword = () => {
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
       <div className="card p-4 shadow-lg" style={{ width: "350px" }}>
         <h2 className="text-center mb-3">Reset Password</h2>
+        {message && <div className="alert alert-success text-center">{message}</div>}
         <form onSubmit={handleReset}>
           <div className="mb-3">
             <label className="form-label">Email</label>

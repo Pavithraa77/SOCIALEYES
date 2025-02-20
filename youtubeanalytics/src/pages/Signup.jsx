@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../config/firebase"; // Ensure correct import path
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -7,13 +9,25 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    if (name && email && password) {
-      alert("Account created successfully! Please log in.");
-      navigate("/login");
-    } else {
+    if (!name || !email || !password) {
       alert("Please fill all fields");
+      return;
+    }
+
+    try {
+      // Create user in Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Update user profile with display name
+      await updateProfile(user, { displayName: name });
+
+      alert("Account created successfully! Please log in.");
+      navigate("/login"); // Redirect to login page
+    } catch (error) {
+      alert(error.message); // Show Firebase error message
     }
   };
 

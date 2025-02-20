@@ -1,27 +1,33 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../config/firebase";
+
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email && password) {
-      navigate("/dashboard"); // Simulating successful login
-    } else {
-      alert("Please enter email and password");
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate("/dashboard"); // Redirect after successful login
+    } catch (error) {
+      alert(error.message); // Show Firebase authentication error
     }
   };
-  const handleGoogleLogin = () => {
-    const userEmail = prompt("Enter your email to continue with Google:");
-    if (userEmail) {
-      alert(`Redirecting ${userEmail} to Google authentication...`);
-      // Here you would integrate actual Google OAuth logic
+
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      navigate("/dashboard"); // Redirect on successful Google login
+    } catch (error) {
+      alert(error.message);
     }
   };
-  
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
@@ -55,9 +61,8 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Forgot Password & Sign Up */}
         <div className="d-flex justify-content-between mt-3">
-          <button className="btn btn-link p-0" onClick={() => alert("Redirect to forgot password")}>
+          <button className="btn btn-link p-0" onClick={() => navigate("/forgot-password")}>
             Forgot Password?
           </button>
           <button className="btn btn-link p-0" onClick={() => navigate("/signup")}>
@@ -65,16 +70,13 @@ const Login = () => {
           </button>
         </div>
 
-        {/* OR Divider */}
         <div className="text-center my-3">
           <span className="text-muted">or</span>
         </div>
 
-        {/* Google Login Button */}
         <button className="btn btn-danger w-100" onClick={handleGoogleLogin}>
-  <i className="bi bi-google"></i> Continue with Google
-</button>
-
+          <i className="bi bi-google"></i> Continue with Google
+        </button>
       </div>
     </div>
   );
