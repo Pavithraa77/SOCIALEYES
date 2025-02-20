@@ -7,22 +7,31 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="container">
-      <h1>Dashboard</h1>
-      <nav className="mb-3">
-        <button className="btn btn-outline-primary me-2" onClick={() => setActiveFeature("youtube")}>
-          YouTube Analytics
-        </button>
-        <button className="btn btn-outline-secondary me-2" onClick={() => setActiveFeature("settings")}>
-          Settings
-        </button>
-        <button className="btn btn-danger" onClick={() => navigate("/")}>
-          Logout
-        </button>
-      </nav>
+    <div className="d-flex vh-100">
+      {/* Sidebar */}
+      <div className="bg-dark text-white p-3 d-flex flex-column" style={{ width: "250px" }}>
+        <h2 className="text-center">Dashboard</h2>
+        <nav className="nav flex-column mt-3">
+          <button className={`btn ${activeFeature === "youtube" ? "btn-primary" : "btn-outline-light"} my-2`} 
+            onClick={() => setActiveFeature("youtube")}>
+            YouTube Analytics
+          </button>
+          <button className={`btn ${activeFeature === "settings" ? "btn-primary" : "btn-outline-light"} my-2`} 
+            onClick={() => setActiveFeature("settings")}>
+            Settings
+          </button>
+          <button className="btn btn-danger mt-auto" onClick={() => navigate("/")}>
+            Logout
+          </button>
+        </nav>
+      </div>
 
-      {activeFeature === "youtube" && <YouTubeAnalytics />}
-      {activeFeature === "settings" && <h3>Settings Page (Coming Soon)</h3>}
+      {/* Content Area */}
+      <div className="flex-grow-1 p-4">
+        {activeFeature === "youtube" && <YouTubeAnalytics />}
+        {activeFeature === "settings" && <h3>Settings Page (Coming Soon)</h3>}
+        {activeFeature === "home" && <h3>Welcome to the Dashboard</h3>}
+      </div>
     </div>
   );
 };

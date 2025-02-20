@@ -1,16 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer } from "recharts";
 
 const YouTubeAnalytics = () => {
   const [videoURL, setVideoURL] = useState("");
   const [channelStats, setChannelStats] = useState(null);
   const [videoStats, setVideoStats] = useState(null);
-  const [channelName, setChannelName] = useState("");
   const [videoTitle, setVideoTitle] = useState("");
+  const [videoThumbnail, setVideoThumbnail] = useState("");
+  const [channelName, setChannelName] = useState("");
+  const [channelProfile, setChannelProfile] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [tracking, setTracking] = useState(false);
+  const [statsHistory, setStatsHistory] = useState([]); // Store stats over time
 
   const apiKey = "AIzaSyDBQAU6xAr29VabVv4vZfXj0rvFVoPchKk";
 
   const extractVideoID = (url) => {
-    let match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
+    let match = url.match(/(?:v=|\/|shorts\/|embed\/|youtu.be\/|\/v\/|\/e\/|watch\?v=|&v=|vi\/|\/user\/[^/]+\/|\/channel\/[^/]+\/)([0-9A-Za-z_-]{11})/);
     return match ? match[1] : null;
   };
 
@@ -21,6 +27,7 @@ const YouTubeAnalytics = () => {
       return;
     }
 
+    setLoading(true);
     try {
       let videoRes = await fetch(
         `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoID}&key=${apiKey}`
@@ -30,9 +37,17 @@ const YouTubeAnalytics = () => {
       if (videoData.items.length > 0) {
         let video = videoData.items[0];
 
-        // Store video title
+        // Store video details
         setVideoTitle(video.snippet.title);
+        setVideoThumbnail(video.snippet.thumbnails.high.url);
+        const newStats = {
+          time: new Date().toLocaleTimeString(),
+          views: parseInt(video.statistics.viewCount),
+          likes: parseInt(video.statistics.likeCount),
+          comments: parseInt(video.statistics.commentCount),
+        };
         setVideoStats(video.statistics);
+        setStatsHistory((prev) => [...prev, newStats]); // Update graph data
 
         let channelID = video.snippet.channelId;
         let channelRes = await fetch(
@@ -43,21 +58,30 @@ const YouTubeAnalytics = () => {
         if (channelData.items.length > 0) {
           let channel = channelData.items[0];
           setChannelStats(channel.statistics);
-
-          // Store channel name
           setChannelName(channel.snippet.title);
+          setChannelProfile(channel.snippet.thumbnails.high.url);
         }
       } else {
         alert("Invalid Video ID or no data found.");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Auto-refresh every 30 seconds when tracking is enabled
+  useEffect(() => {
+    if (tracking) {
+      const interval = setInterval(fetchStatistics, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [tracking]);
+
   return (
-    <div className="container">
-      <h2>YouTube Analytics</h2>
+    <div className="container mt-4">
+      <h2 className="mb-3">YouTube Analytics</h2>
       <input
         type="text"
         className="form-control mb-2"
@@ -65,23 +89,55 @@ const YouTubeAnalytics = () => {
         value={videoURL}
         onChange={(e) => setVideoURL(e.target.value)}
       />
-      <button className="btn btn-primary mb-3" onClick={fetchStatistics}>
+      <button className="btn btn-primary mb-3 me-2" onClick={fetchStatistics}>
         Show Statistics
       </button>
+      <button className={`btn ${tracking ? "btn-danger" : "btn-success"} mb-3`} onClick={() => setTracking(!tracking)}>
+        {tracking ? "Stop Tracking" : "Start Real-time Tracking"}
+      </button>
+
+      {loading && <div className="spinner-border text-primary mt-3" role="status"><span className="visually-hidden">Loading...</span></div>}
 
       {channelStats && videoStats && (
         <div>
-          <h4>Channel Info</h4>
-          <p><strong>Channel Name:</strong> {channelName}</p>
-          <p><strong>Subscribers:</strong> {channelStats.subscriberCount}</p>
-          <p><strong>Videos:</strong> {channelStats.videoCount}</p>
-          <p><strong>Total Views:</strong> {channelStats.viewCount}</p>
+          {/* Channel Info */}
+          <div className="card mb-3 p-3">
+            <div className="d-flex align-items-center">
+              <img src={channelProfile} alt="Channel Profile" className="rounded-circle me-3" style={{ width: "60px", height: "60px" }} />
+              <h4 className="mb-0">{channelName}</h4>
+            </div>
+            <p><strong>Subscribers:</strong> {channelStats.subscriberCount}</p>
+            <p><strong>Total Videos:</strong> {channelStats.videoCount}</p>
+            <p><strong>Total Views:</strong> {channelStats.viewCount}</p>
+          </div>
 
-          <h4>Video Info</h4>
-          <p><strong>Video Title:</strong> {videoTitle}</p>
-          <p><strong>Views:</strong> {videoStats.viewCount}</p>
-          <p><strong>Likes:</strong> {videoStats.likeCount}</p>
-          <p><strong>Comments:</strong> {videoStats.commentCount}</p>
+          {/* Video Info */}
+          <div className="card p-3">
+            <div className="text-center">
+              <img src={videoThumbnail} alt="Video Thumbnail" className="img-fluid rounded mb-3" style={{ maxWidth: "300px" }} />
+            </div>
+            <h4>{videoTitle}</h4>
+            <p><strong>Views:</strong> {videoStats.viewCount}</p>
+            <p><strong>Likes:</strong> {videoStats.likeCount}</p>
+            <p><strong>Comments:</strong> {videoStats.commentCount}</p>
+          </div>
+
+          {/* Graph: Views, Likes, Comments */}
+          <div className="card mt-4 p-3">
+            <h4>Real-Time Engagement Metrics</h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={statsHistory}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="views" stroke="#8884d8" name="Views" />
+                <Line type="monotone" dataKey="likes" stroke="#82ca9d" name="Likes" />
+                <Line type="monotone" dataKey="comments" stroke="#ffc658" name="Comments" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       )}
     </div>
