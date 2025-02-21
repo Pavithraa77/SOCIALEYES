@@ -1,0 +1,90 @@
+/* Dashboard Container */
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    font-family: "Arial", sans-serif;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 250px;
+    background-color: #1e1e2d;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Dashboard Title */
+  .dashboard-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  /* Navigation Menu */
+  .nav-menu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  /* Navigation Buttons */
+  .nav-button {
+    width: 100%;
+    background: transparent;
+    border: 2px solid transparent;
+    color: white;
+    font-size: 16px;
+    padding: 12px;
+    margin: 5px 0;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .nav-button:hover {
+    background-color: #292943;
+    border-left: 4px solid #007bff;
+  }
+  
+  /* Active Button */
+  .nav-button.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+  }
+  
+  /* Logout Button */
+  .logout-button {
+    width: 100%;
+    margin-top: auto;
+    background-color: #dc3545;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .logout-button:hover {
+    background-color: #a82834;
+  }
+  
+  /* Content Area */
+  .content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .content-heading {
+    font-size: 24px;
+    color: #333;
+  }
+  
