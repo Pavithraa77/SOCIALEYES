@@ -120,18 +120,24 @@ const YouTubeAnalytics = () => {
 
           <div className="card mt-4 p-3">
             <h4 className="text-center">Real-Time Engagement Metrics</h4>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={statsHistory}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="views" stroke="#8884d8" name="Views" />
-                <Line type="monotone" dataKey="likes" stroke="#82ca9d" name="Likes" />
-                <Line type="monotone" dataKey="comments" stroke="#ffc658" name="Comments" />
-              </LineChart>
-            </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={350}>
+  <LineChart data={statsHistory} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis dataKey="time" />
+    <YAxis domain={["dataMin", "dataMax + 5"]} allowDecimals={false} />
+    <Tooltip />
+    <Legend />
+    <Line
+      type="monotone"
+      dataKey="likes"
+      stroke="#82ca9d"
+      strokeWidth={3}
+      dot={{ r: 5, stroke: "#82ca9d", strokeWidth: 2, fill: "white" }}
+      activeDot={{ r: 8 }}
+    />
+  </LineChart>
+</ResponsiveContainer>
+
           </div>
         </div>
       )}
