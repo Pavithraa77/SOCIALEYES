@@ -11,7 +11,7 @@ const YouTubeAnalytics = () => {
   const [channelProfile, setChannelProfile] = useState("");
   const [loading, setLoading] = useState(false);
   const [tracking, setTracking] = useState(false);
-  const [statsHistory, setStatsHistory] = useState([]); // Store stats over time
+  const [statsHistory, setStatsHistory] = useState([]);
 
   const apiKey = "AIzaSyDBQAU6xAr29VabVv4vZfXj0rvFVoPchKk";
 
@@ -37,7 +37,6 @@ const YouTubeAnalytics = () => {
       if (videoData.items.length > 0) {
         let video = videoData.items[0];
 
-        // Store video details
         setVideoTitle(video.snippet.title);
         setVideoThumbnail(video.snippet.thumbnails.high.url);
         const newStats = {
@@ -47,7 +46,7 @@ const YouTubeAnalytics = () => {
           comments: parseInt(video.statistics.commentCount),
         };
         setVideoStats(video.statistics);
-        setStatsHistory((prev) => [...prev, newStats]); // Update graph data
+        setStatsHistory((prev) => [...prev, newStats]);
 
         let channelID = video.snippet.channelId;
         let channelRes = await fetch(
@@ -71,7 +70,6 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // Auto-refresh every 30 seconds when tracking is enabled
   useEffect(() => {
     if (tracking) {
       const interval = setInterval(fetchStatistics, 30000);
@@ -81,7 +79,7 @@ const YouTubeAnalytics = () => {
 
   return (
     <div className="container mt-4">
-      <h2 className="mb-3">YouTube Analytics</h2>
+      <h2 className="mb-3 text-center">YouTube Analytics</h2>
       <input
         type="text"
         className="form-control mb-2"
@@ -89,42 +87,39 @@ const YouTubeAnalytics = () => {
         value={videoURL}
         onChange={(e) => setVideoURL(e.target.value)}
       />
-      <button className="btn btn-primary mb-3 me-2" onClick={fetchStatistics}>
-        Show Statistics
-      </button>
-      <button className={`btn ${tracking ? "btn-danger" : "btn-success"} mb-3`} onClick={() => setTracking(!tracking)}>
-        {tracking ? "Stop Tracking" : "Start Real-time Tracking"}
-      </button>
+      <div className="d-flex justify-content-center mb-3">
+        <button className="btn btn-primary me-2" onClick={fetchStatistics}>
+          Show Statistics
+        </button>
+        <button className={`btn ${tracking ? "btn-danger" : "btn-success"}`} onClick={() => setTracking(!tracking)}>
+          {tracking ? "Stop Tracking" : "Start Real-time Tracking"}
+        </button>
+      </div>
 
-      {loading && <div className="spinner-border text-primary mt-3" role="status"><span className="visually-hidden">Loading...</span></div>}
+      {loading && <div className="text-center spinner-border text-primary mt-3" role="status"><span className="visually-hidden">Loading...</span></div>}
 
       {channelStats && videoStats && (
         <div>
-          {/* Channel Info */}
-          <div className="card mb-3 p-3">
-            <div className="d-flex align-items-center">
-              <img src={channelProfile} alt="Channel Profile" className="rounded-circle me-3" style={{ width: "60px", height: "60px" }} />
-              <h4 className="mb-0">{channelName}</h4>
+          <div className="card mb-3 p-3 text-start d-flex align-items-center" style={{ display: "flex", flexDirection: "row" }}>
+            <img src={channelProfile} alt="Channel Profile" className="rounded-circle me-3" style={{ width: "80px", height: "80px" }} />
+            <div>
+              <h4 className="mb-2">{channelName}</h4>
+              <p><strong>Subscribers:</strong> {channelStats.subscriberCount}</p>
+              <p><strong>Total Videos:</strong> {channelStats.videoCount}</p>
+              <p><strong>Total Views:</strong> {channelStats.viewCount}</p>
             </div>
-            <p><strong>Subscribers:</strong> {channelStats.subscriberCount}</p>
-            <p><strong>Total Videos:</strong> {channelStats.videoCount}</p>
-            <p><strong>Total Views:</strong> {channelStats.viewCount}</p>
           </div>
 
-          {/* Video Info */}
-          <div className="card p-3">
-            <div className="text-center">
-              <img src={videoThumbnail} alt="Video Thumbnail" className="img-fluid rounded mb-3" style={{ maxWidth: "300px" }} />
-            </div>
+          <div className="card p-3 text-center d-flex align-items-center justify-content-center">
+            <img src={videoThumbnail} alt="Video Thumbnail" className="img-fluid rounded mb-3" style={{ maxWidth: "500px" }} />
             <h4>{videoTitle}</h4>
             <p><strong>Views:</strong> {videoStats.viewCount}</p>
             <p><strong>Likes:</strong> {videoStats.likeCount}</p>
             <p><strong>Comments:</strong> {videoStats.commentCount}</p>
           </div>
 
-          {/* Graph: Views, Likes, Comments */}
           <div className="card mt-4 p-3">
-            <h4>Real-Time Engagement Metrics</h4>
+            <h4 className="text-center">Real-Time Engagement Metrics</h4>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={statsHistory}>
                 <CartesianGrid strokeDasharray="3 3" />
