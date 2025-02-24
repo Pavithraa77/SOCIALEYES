@@ -1,0 +1,86 @@
+
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+/* Full Page Background */
+.signup-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to right, #1a1a2e, #16213e);
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Signup Card */
+.signup-card {
+    width: 350px;
+    padding: 25px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Title */
+.signup-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+/* Form Fields */
+.signup-card .form-label {
+    font-weight: 500;
+    color:  #fff;
+}
+
+.signup-card .form-control {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: all 0.3s ease-in-out;
+}
+
+.signup-card .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Signup Button */
+.signup-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(to right, #007bff, #0056b3);
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+.signup-btn:hover {
+    background: linear-gradient(to right, #0056b3, #003d82);
+    transform: scale(1.03);
+}
+
+/* Login Link */
+.signup-link {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.signup-link button {
+    background: none;
+    border: none;
+    color: #007bff;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.signup-link button:hover {
+    text-decoration: underline;
+}
