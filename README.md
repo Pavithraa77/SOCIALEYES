@@ -8,31 +8,26 @@ This project provides an interactive platform for users to view and analyze thei
 
 ## Features
 ### 1. Login
-  ![Select Social Media Platform](1.jpg)
+  ![Select Social Media Platform](src/assets/1.jpg)
 ### 2. Dashboard
-  ![Engagement Metrics](2.jpg)
+  ![Engagement Metrics](src/assets/2.jpg)
 - **Select Social Media Platform**: Choose from available platforms such as Instagram, Twitter, Facebook to view platform-specific statistics.
-
 
 - **View Platform-Specific Statistics**: Displays metrics such as follower count, engagement rate, and recent activity for the selected platform.
 
-
 - **Sync Data**: Fetch the latest data from the selected platform and refresh the dashboard for real-time updates.
 
-
 - **Logout**: Securely log out from the platform to ensure account privacy.
-
 
 ---
 
 ### 3. Analytics
-  ![Scheduled Reports](3.jpg)
+  ![Scheduled Reports](src/assets/3.jpg)
 - **View Engagement Metrics**: Track and view engagement metrics such as likes, comments, shares, and overall engagement rate for the selected platform.
 
 - **Analyze Follower Trends**: Visualize follower growth over time through interactive graphs and detailed data points.
 
 - **Compare Timeframes**: Compare metrics between two different timeframes using tabular or graphical formats.
-
 
 ---
 
