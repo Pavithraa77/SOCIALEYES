@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaYoutube, FaCog } from "react-icons/fa"; // Import Icons
+import { FaYoutube, FaCog, FaChartBar, FaUsers } from "react-icons/fa"; 
 import YouTubeAnalytics from "./YoutubeAnalytics";
-import "../css/Dashboard.css"; // Import the CSS file
+import "../css/Dashboard.css"; 
 
 const Dashboard = () => {
   const [activeFeature, setActiveFeature] = useState("home");
@@ -10,28 +10,59 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-wrapper">
-      {/* Sidebar for Dashboard and Buttons */}
+      {/* Sidebar */}
       <div className="dashboard-sidebar">
         <h1 className="dashboard-title">Dashboard</h1>
-
-        {/* Buttons in Vertical Layout */}
         <nav className="dashboard-nav">
-          <button className="btn dashboard-btn youtube-btn" onClick={() => setActiveFeature("youtube")}>
-            <FaYoutube className="dashboard-icon" />
+          {/* YouTube Icon Button */}
+          <button className="icon-btn" onClick={() => setActiveFeature("youtube")}>
+            <FaYoutube className="dashboard-icon youtube-icon" />
           </button>
-          <button className="btn dashboard-btn settings-btn" onClick={() => setActiveFeature("settings")}>
+
+          {/* Settings Icon Button */}
+          <button className="icon-btn" onClick={() => setActiveFeature("settings")}>
             <FaCog className="dashboard-icon" />
           </button>
-          <button className="btn dashboard-btn logout-btn" onClick={() => navigate("/")}>
+
+          {/* Logout Button (Text Only) */}
+          <button className="logout-text-btn" onClick={() => navigate("/")}>
             Logout
           </button>
         </nav>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <div className="dashboard-content">
         {activeFeature === "youtube" && <YouTubeAnalytics />}
         {activeFeature === "settings" && <h3 className="coming-soon">Settings Page (Coming Soon)</h3>}
+
+        {activeFeature === "home" && (
+          <div>
+            <h2>Social Media Insights</h2>
+            <p>Get real-time data on social media engagement, follower growth, and content performance.</p>
+
+            <div className="stats-container">
+              <div className="stat-card">
+                <FaChartBar className="stat-icon" />
+                <h3>Engagement Rate</h3>
+                <p>15.2% increase this month</p>
+              </div>
+              
+              <div className="stat-card">
+                <FaUsers className="stat-icon" />
+                <h3>New Followers</h3>
+                <p>+2,340 new users</p>
+              </div>
+            </div>
+
+            <h3>Trending Topics</h3>
+            <ul className="trending-topics">
+              <li>#TechTrends2025</li>
+              <li>#SocialGrowth</li>
+              <li>#MarketingAnalytics</li>
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );

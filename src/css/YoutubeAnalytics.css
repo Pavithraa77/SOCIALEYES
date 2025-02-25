@@ -1,0 +1,91 @@
+.youtube-container {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 2rem;
+  }
+  
+  .input-field {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .btn {
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    border: none;
+  }
+  
+  .fetch-btn {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .tracking-btn-start {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .tracking-btn-stop {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .loading {
+    text-align: center;
+    margin-top: 15px;
+  }
+  
+  .channel-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .channel-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+  }
+  
+  .video-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .video-player {
+    width: 100%;
+    max-width: 600px;
+    height: 350px;
+    border-radius: 10px;
+  }
+  
+  .video-stats {
+    margin-top: 10px;
+  }
+  
+  .chart-container {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
