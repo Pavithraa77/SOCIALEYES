@@ -45,17 +45,28 @@
   transition: all 0.3s ease;
   color: white;
   border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dashboard Button Icons */
+.dashboard-icon {
+  font-size: 1.8rem; /* Makes icons bigger */
+  color: white;
 }
 
 /* Specific Button Colors */
 .youtube-btn {
-  background-color: #007bff;
+  background-color: #ff0000; /* YouTube Red */
 }
+
 .settings-btn {
-  background-color: #6c757d;
+  background-color: #6c757d; /* Grey */
 }
+
 .logout-btn {
-  background-color: #dc3545;
+  background-color: #dc3545; /* Red */
 }
 
 /* Hover Effects */

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaYoutube, FaCog } from "react-icons/fa"; // Import Icons
 import YouTubeAnalytics from "./YoutubeAnalytics";
-import "./Dashboard.css"; // Import the CSS file
+import "../css/Dashboard.css"; // Import the CSS file
 
 const Dashboard = () => {
   const [activeFeature, setActiveFeature] = useState("home");
@@ -16,10 +17,10 @@ const Dashboard = () => {
         {/* Buttons in Vertical Layout */}
         <nav className="dashboard-nav">
           <button className="btn dashboard-btn youtube-btn" onClick={() => setActiveFeature("youtube")}>
-            YouTube Analytics
+            <FaYoutube className="dashboard-icon" />
           </button>
           <button className="btn dashboard-btn settings-btn" onClick={() => setActiveFeature("settings")}>
-            Settings
+            <FaCog className="dashboard-icon" />
           </button>
           <button className="btn dashboard-btn logout-btn" onClick={() => navigate("/")}>
             Logout
