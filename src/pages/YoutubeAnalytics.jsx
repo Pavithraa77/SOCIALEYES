@@ -40,6 +40,16 @@ const YouTubeAnalytics = () => {
   const [comments, setComments] = useState([]);
   const [sentimentData, setSentimentData] = useState([]);
   const sentimentAnalyzer = new Sentiment();
+  
+  // NEW: State for showing embedded video player and selected video id
+  const [showPlayer, setShowPlayer] = useState(false);
+  const [currentVideoId, setCurrentVideoId] = useState(null);
+
+  // Helper to format numbers with commas
+  const formatNumber = (num) => {
+    if (isNaN(num)) return num;
+    return Number(num).toLocaleString();
+  };
 
   // Replace with your own API key
   const apiKey = "AIzaSyDBQAU6xAr29VabVv4vZfXj0rvFVoPchKk";
@@ -50,13 +60,13 @@ const YouTubeAnalytics = () => {
     { id: "videoStats", label: "Video Stats" },
     { id: "engagementMetrics", label: "Real-Time Engagement Metrics" },
     { id: "mostViewedVideos", label: "Most Viewed Videos" },
-    { id: "mostLikedVideos", label: "Most Liked Videos" },
+    { id: "mostRatedVideos", label: "Highly Rated Videos" },
     { id: "sentimentAnalysis", label: "Comment Sentiment Analysis" },
   ];
 
   const extractVideoID = (url) => {
     let match = url.match(
-      /(?:v=|\/|shorts\/|embed\/|youtu.be\/|\/v\/|\/e\/|watch\?v=|&v=|vi\/|\/user\/[^/]+\/|\/channel\/[^/]+\/)([0-9A-Za-z_-]{11})/
+      /(?:v=|\/|shorts\/|embed\/|youtu\.be\/|\/v\/|\/e\/|watch\?v=|&v=|vi\/|\/user\/[^/]+\/|\/channel\/[^/]+\/)([0-9A-Za-z_-]{11})/
     );
     return match ? match[1] : null;
   };
@@ -156,7 +166,7 @@ const YouTubeAnalytics = () => {
           );
           setMostViewedVideos(viewedVideosWithDetails);
 
-          // Fetch 4 most liked videos
+          // Fetch 4 most liked videos (Highly Rated Videos)
           let likedVideosRes = await fetch(
             `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelID}&maxResults=4&order=rating&type=video&key=${apiKey}`
           );
@@ -176,29 +186,6 @@ const YouTubeAnalytics = () => {
       console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (tracking) {
-      const interval = setInterval(fetchStatistics, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [tracking]);
-
-  const onDragEnd = (result) => {
-    if (!result.destination) return;
-    const items = Array.from(selectedComponents);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setSelectedComponents(items);
-  };
-
-  const toggleComponent = (id) => {
-    if (selectedComponents.includes(id)) {
-      setSelectedComponents(selectedComponents.filter((item) => item !== id));
-    } else {
-      setSelectedComponents([...selectedComponents, id]);
     }
   };
 
@@ -233,12 +220,35 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // NEW: When videoStats update and sentiment analysis is selected, fetch sentiment data
+  // NEW: When sentiment analysis is selected and videoStats updates, fetch sentiment data
   useEffect(() => {
     if (selectedComponents.includes("sentimentAnalysis") && videoStats) {
       fetchSentimentAnalysis();
     }
   }, [videoStats, selectedComponents]);
+
+  useEffect(() => {
+    if (tracking) {
+      const interval = setInterval(fetchStatistics, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [tracking]);
+
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+    const items = Array.from(selectedComponents);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    setSelectedComponents(items);
+  };
+
+  const toggleComponent = (id) => {
+    if (selectedComponents.includes(id)) {
+      setSelectedComponents(selectedComponents.filter((item) => item !== id));
+    } else {
+      setSelectedComponents([...selectedComponents, id]);
+    }
+  };
 
   // NEW: Compute summary data for sentiment chart
   const sentimentSummary = sentimentData.reduce(
@@ -256,6 +266,17 @@ const YouTubeAnalytics = () => {
     { name: "Neutral", value: sentimentSummary.neutral, color: "#8884d8" },
     { name: "Negative", value: sentimentSummary.negative, color: "#ff6961" },
   ];
+
+  // NEW: Handler to show the embedded video player for any video
+  const handleVideoClick = (videoId) => {
+    setCurrentVideoId(videoId);
+    setShowPlayer(true);
+  };
+
+  // NEW: Handler to close the embedded video player
+  const closePlayer = () => {
+    setShowPlayer(false);
+  };
 
   return (
     <div className="container mt-4">
@@ -345,13 +366,13 @@ const YouTubeAnalytics = () => {
               <div>
                 <h4 className="mb-2">{channelName}</h4>
                 <p>
-                  <strong>Subscribers:</strong> {channelStats.subscriberCount}
+                  <strong>Subscribers:</strong> {formatNumber(channelStats.subscriberCount)}
                 </p>
                 <p>
-                  <strong>Total Videos:</strong> {totalVideos}
+                  <strong>Total Videos:</strong> {formatNumber(totalVideos)}
                 </p>
                 <p>
-                  <strong>Total Views:</strong> {channelStats.viewCount}
+                  <strong>Total Views:</strong> {formatNumber(channelStats.viewCount)}
                 </p>
                 <p>
                   <strong>Upload Frequency:</strong> {uploadFrequency}
@@ -366,22 +387,23 @@ const YouTubeAnalytics = () => {
                 src={videoThumbnail}
                 alt="Video Thumbnail"
                 className="img-fluid rounded mb-3"
-                style={{ maxWidth: "500px" }}
+                style={{ maxWidth: "500px", cursor: "pointer" }}
+                onClick={() => handleVideoClick(extractVideoID(videoURL))}
               />
               <h4>{videoTitle}</h4>
               <p>
-                <strong>Views:</strong> {videoStats.viewCount}
+                <strong>Views:</strong> {formatNumber(videoStats.viewCount)}
               </p>
               <p>
-                <strong>Likes:</strong> {videoStats.likeCount}
+                <strong>Likes:</strong> {formatNumber(videoStats.likeCount)}
               </p>
               <p>
-                <strong>Comments:</strong> {videoStats.commentCount}
+                <strong>Comments:</strong> {formatNumber(videoStats.commentCount)}
               </p>
               <p>
                 <strong>Comments Per View:</strong>{" "}
                 {commentsPerView !== "N/A"
-                  ? `1 in ${commentsPerView} viewers comments`
+                  ? `1 in ${formatNumber(commentsPerView)} viewers comments`
                   : "No comments yet"}
               </p>
               <p>
@@ -424,7 +446,12 @@ const YouTubeAnalytics = () => {
               <h4 className="text-center">Most Viewed Videos</h4>
               <div className="d-flex flex-wrap justify-content-center">
                 {mostViewedVideos.map((video, index) => (
-                  <div key={index} className="card m-2" style={{ width: "200px" }}>
+                  <div
+                    key={index}
+                    className="card m-2"
+                    style={{ width: "200px", cursor: "pointer" }}
+                    onClick={() => handleVideoClick(video.id.videoId)}
+                  >
                     <img
                       src={video.snippet.thumbnails.medium.url}
                       alt="Thumbnail"
@@ -433,7 +460,7 @@ const YouTubeAnalytics = () => {
                     <div className="card-body">
                       <p className="card-text">{video.snippet.title}</p>
                       <p className="card-text">
-                        <strong>Views:</strong> {video.views}
+                        <strong>Views:</strong> {formatNumber(video.views)}
                       </p>
                     </div>
                   </div>
@@ -442,12 +469,17 @@ const YouTubeAnalytics = () => {
             </div>
           )}
 
-          {selectedComponents.includes("mostLikedVideos") && (
+          {selectedComponents.includes("mostRatedVideos") && (
             <div className="card mt-4 p-3">
-              <h4 className="text-center">Most Liked Videos</h4>
+              <h4 className="text-center">Highly Rated Videos</h4>
               <div className="d-flex flex-wrap justify-content-center">
                 {mostLikedVideos.map((video, index) => (
-                  <div key={index} className="card m-2" style={{ width: "200px" }}>
+                  <div
+                    key={index}
+                    className="card m-2"
+                    style={{ width: "200px", cursor: "pointer" }}
+                    onClick={() => handleVideoClick(video.id.videoId)}
+                  >
                     <img
                       src={video.snippet.thumbnails.medium.url}
                       alt="Thumbnail"
@@ -456,7 +488,7 @@ const YouTubeAnalytics = () => {
                     <div className="card-body">
                       <p className="card-text">{video.snippet.title}</p>
                       <p className="card-text">
-                        <strong>Likes:</strong> {video.likes}
+                        <strong>Likes:</strong> {formatNumber(video.likes)}
                       </p>
                     </div>
                   </div>
@@ -465,20 +497,12 @@ const YouTubeAnalytics = () => {
             </div>
           )}
 
-          {/* NEW: Display Comment Sentiment Analysis */}
           {selectedComponents.includes("sentimentAnalysis") && (
             <div className="card mt-4 p-3">
               <h4 className="text-center">Comment Sentiment Analysis</h4>
               <ResponsiveContainer width="100%" height={350}>
                 <PieChart>
-                  <Pie
-                    data={sentimentChartData}
-                    dataKey="value"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    label
-                  >
+                  <Pie data={sentimentChartData} dataKey="value" cx="50%" cy="50%" outerRadius={100} label>
                     {sentimentChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
@@ -489,6 +513,63 @@ const YouTubeAnalytics = () => {
               </ResponsiveContainer>
             </div>
           )}
+        </div>
+      )}
+
+      {/* --- Embedded Video Player Modal --- */}
+      {showPlayer && currentVideoId && (
+        <div
+          className="video-modal"
+          onClick={closePlayer}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0,0,0,0.8)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              width: "80%",
+              maxWidth: "800px",
+              background: "#000",
+            }}
+          >
+            <button
+              onClick={closePlayer}
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                zIndex: 1001,
+                background: "red",
+                color: "#fff",
+                border: "none",
+                borderRadius: "5px",
+                padding: "5px 10px",
+                cursor: "pointer",
+              }}
+            >
+              Close
+            </button>
+            <iframe
+              width="100%"
+              height="450"
+              src={`https://www.youtube.com/embed/${currentVideoId}`}
+              title="YouTube Video Player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
         </div>
       )}
     </div>
