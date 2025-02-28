@@ -198,7 +198,7 @@ const YouTubeAnalytics = () => {
     }
     try {
       const commentsRes = await fetch(
-        `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoID}&key=${apiKey}&maxResults=100`
+        `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoID}&key=${apiKey}&maxResults=1000`
       );
       const commentsData = await commentsRes.json();
       if (commentsData.items && commentsData.items.length > 0) {
