@@ -14,6 +14,7 @@ import {
   Cell,
 } from "recharts";
 import Sentiment from "sentiment";
+import { CSVLink } from "react-csv"; // Import CSVLink for CSV export
 
 const YouTubeAnalytics = () => {
   const [videoURL, setVideoURL] = useState("");
@@ -35,13 +36,9 @@ const YouTubeAnalytics = () => {
   const [totalVideos, setTotalVideos] = useState(0);
   const [uploadFrequency, setUploadFrequency] = useState("");
   const [selectedComponents, setSelectedComponents] = useState([]);
-  
-  // NEW: State for comment sentiment analysis
   const [comments, setComments] = useState([]);
   const [sentimentData, setSentimentData] = useState([]);
   const sentimentAnalyzer = new Sentiment();
-  
-  // NEW: State for showing embedded video player and selected video id
   const [showPlayer, setShowPlayer] = useState(false);
   const [currentVideoId, setCurrentVideoId] = useState(null);
 
@@ -54,7 +51,6 @@ const YouTubeAnalytics = () => {
   // Replace with your own API key
   const apiKey = "AIzaSyDBQAU6xAr29VabVv4vZfXj0rvFVoPchKk";
 
-  // Updated components list: added new option for sentiment analysis
   const componentsList = [
     { id: "channelStats", label: "Channel Stats" },
     { id: "videoStats", label: "Video Stats" },
@@ -189,7 +185,7 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // NEW: Fetch sentiment analysis for video comments
+  // Fetch sentiment analysis for video comments
   const fetchSentimentAnalysis = async () => {
     let videoID = extractVideoID(videoURL);
     if (!videoID) {
@@ -220,7 +216,7 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // NEW: When sentiment analysis is selected and videoStats updates, fetch sentiment data
+  // When sentiment analysis is selected and videoStats updates, fetch sentiment data
   useEffect(() => {
     if (selectedComponents.includes("sentimentAnalysis") && videoStats) {
       fetchSentimentAnalysis();
@@ -250,7 +246,7 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // NEW: Compute summary data for sentiment chart
+  // Compute summary data for sentiment chart
   const sentimentSummary = sentimentData.reduce(
     (acc, { score }) => {
       if (score > 0) acc.positive++;
@@ -267,15 +263,108 @@ const YouTubeAnalytics = () => {
     { name: "Negative", value: sentimentSummary.negative, color: "#ff6961" },
   ];
 
-  // NEW: Handler to show the embedded video player for any video
+  // Handler to show the embedded video player for any video
   const handleVideoClick = (videoId) => {
     setCurrentVideoId(videoId);
     setShowPlayer(true);
   };
 
-  // NEW: Handler to close the embedded video player
+  // Handler to close the embedded video player
   const closePlayer = () => {
     setShowPlayer(false);
+  };
+
+  // NEW: Generate CSV data by combining the available stats into an array of objects
+  const generateCSVData = () => {
+    const data = [];
+
+    if (channelStats && videoStats) {
+      // Channel Stats
+      data.push({ Category: "Channel Stats", Field: "Channel Name", Value: channelName });
+      data.push({
+        Category: "Channel Stats",
+        Field: "Subscribers",
+        Value: channelStats.subscriberCount,
+      });
+      data.push({ Category: "Channel Stats", Field: "Total Videos", Value: totalVideos });
+      data.push({
+        Category: "Channel Stats",
+        Field: "Total Views",
+        Value: channelStats.viewCount,
+      });
+      data.push({
+        Category: "Channel Stats",
+        Field: "Upload Frequency",
+        Value: uploadFrequency,
+      });
+
+      // Video Stats
+      data.push({ Category: "Video Stats", Field: "Video Title", Value: videoTitle });
+      data.push({
+        Category: "Video Stats",
+        Field: "Views",
+        Value: videoStats.viewCount,
+      });
+      data.push({
+        Category: "Video Stats",
+        Field: "Likes",
+        Value: videoStats.likeCount,
+      });
+      data.push({
+        Category: "Video Stats",
+        Field: "Comments",
+        Value: videoStats.commentCount,
+      });
+      data.push({ Category: "Video Stats", Field: "Duration", Value: videoDuration });
+      data.push({
+        Category: "Video Stats",
+        Field: "Trending Tags",
+        Value: trendingTags.join(", "),
+      });
+
+      // Real-Time Engagement Metrics History
+      statsHistory.forEach((record, index) => {
+        data.push({
+          Category: "Engagement Metrics",
+          Field: `Record ${index + 1} Time`,
+          Value: record.time,
+        });
+        data.push({
+          Category: "Engagement Metrics",
+          Field: `Record ${index + 1} Views`,
+          Value: record.views,
+        });
+        data.push({
+          Category: "Engagement Metrics",
+          Field: `Record ${index + 1} Likes`,
+          Value: record.likes,
+        });
+        data.push({
+          Category: "Engagement Metrics",
+          Field: `Record ${index + 1} Comments`,
+          Value: record.comments,
+        });
+      });
+
+      // Sentiment Analysis Summary
+      data.push({
+        Category: "Sentiment Analysis",
+        Field: "Positive Comments Count",
+        Value: sentimentSummary.positive,
+      });
+      data.push({
+        Category: "Sentiment Analysis",
+        Field: "Neutral Comments Count",
+        Value: sentimentSummary.neutral,
+      });
+      data.push({
+        Category: "Sentiment Analysis",
+        Field: "Negative Comments Count",
+        Value: sentimentSummary.negative,
+      });
+    }
+
+    return data;
   };
 
   return (
@@ -299,6 +388,19 @@ const YouTubeAnalytics = () => {
           {tracking ? "Stop Tracking" : "Start Real-time Tracking"}
         </button>
       </div>
+
+      {/* Export CSV Button */}
+      {channelStats && videoStats && (
+        <div className="export-button text-center mb-3">
+          <CSVLink
+            data={generateCSVData()}
+            filename={"youtube_analytics_data.csv"}
+            className="btn btn-secondary"
+          >
+            Export Data as CSV
+          </CSVLink>
+        </div>
+      )}
 
       {loading && (
         <div className="text-center spinner-border text-primary mt-3" role="status">

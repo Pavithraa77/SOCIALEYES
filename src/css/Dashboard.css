@@ -142,3 +142,35 @@
   border-radius: 8px;
   font-size: 14px;
 }
+
+.dashboard-logo {
+  width: 100px; /* Adjust the size as needed */
+  height: auto;
+  margin-bottom: 20px; /* Space between logo and title */
+  border-radius: 50%; /* Optional: if you want a circular logo */
+}
+
+.dashboard-title {
+  margin-top: 0; /* Remove default margin */
+}
+
+.dark-mode {
+  background-color: #121212;
+  color: white;
+}
+
+.dark-mode .settings-wrapper,
+.dark-mode .dashboard-content,
+.dark-mode .youtube-analytics-container {
+  background-color: #222;
+  color: white;
+}
+
+.dark-mode button {
+  background-color: #444;
+  color: white;
+}
+
+.dark-mode button:hover {
+  background-color: #555;
+}

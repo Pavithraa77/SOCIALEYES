@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { FaYoutube, FaCog, FaChartBar, FaUsers } from "react-icons/fa"; 
 import YouTubeAnalytics from "./YoutubeAnalytics";
 import "../css/Dashboard.css"; 
+import Settings from "./Settings";
+import logo from "../assets/Logo.jpg";
 
 const Dashboard = () => {
   const [activeFeature, setActiveFeature] = useState("home");
@@ -12,7 +14,9 @@ const Dashboard = () => {
     <div className="dashboard-wrapper">
       {/* Sidebar */}
       <div className="dashboard-sidebar">
-        <h1 className="dashboard-title">Dashboard</h1>
+        {/* Logo */}
+        <img src={logo} alt="Social Eyes Logo" className="dashboard-logo" />
+        <h1 className="dashboard-title">Social Eyes</h1>
         <nav className="dashboard-nav">
           {/* YouTube Icon Button */}
           <button className="icon-btn" onClick={() => setActiveFeature("youtube")}>
@@ -34,7 +38,7 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className="dashboard-content">
         {activeFeature === "youtube" && <YouTubeAnalytics />}
-        {activeFeature === "settings" && <h3 className="coming-soon">Settings Page (Coming Soon)</h3>}
+        {activeFeature === "settings" && <Settings />}
 
         {activeFeature === "home" && (
           <div>

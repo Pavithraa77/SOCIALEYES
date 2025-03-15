@@ -1,0 +1,155 @@
+/* Dark-themed Settings Wrapper */
+.settings-wrapper {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #1c1f2e; /* Dark background matching the website */
+    border-radius: 12px;
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    color: #ffffff; /* Ensure text is readable */
+}
+
+/* Settings Title */
+.settings-title {
+    font-size: 28px;
+    margin-bottom: 25px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* Settings Options */
+.settings-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    background: #2a2d3e; /* Slightly lighter dark shade */
+    color: #ffffff;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.settings-option:hover {
+    background: #33374a;
+    box-shadow: 0px 3px 8px rgba(255, 255, 255, 0.1);
+}
+
+/* Icons */
+.settings-icon {
+    font-size: 22px;
+    color: #dddddd;
+}
+
+/* Toggle Button */
+.toggle-btn {
+    background: transparent;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    padding: 7px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: #007bff;
+    transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+    background: #007bff;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Settings Action Button */
+.settings-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.settings-btn:hover {
+    background: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .settings-wrapper {
+        max-width: 90%;
+        padding: 20px;
+    }
+
+    .settings-title {
+        font-size: 24px;
+    }
+
+    .settings-option {
+        padding: 12px 15px;
+    }
+
+    .toggle-btn, .settings-btn {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+}
+.change-email-wrapper {
+    background: #2a2d3e;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #ccc;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background: #1c1f2e;
+    color: #fff;
+}
+
+.change-email-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.change-email-btn:hover {
+    background: #0056b3;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+.success-message {
+    color: green;
+    margin-top: 10px;
+}

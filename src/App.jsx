@@ -4,7 +4,8 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgetPassword";
 import Dashboard from "./pages/DashBoard";
 import Main from "./pages/Main"
-
+import Settings from "./pages/Settings";
+import ChangeEmail from "./pages/ChangeEmail";
 function App() {
   return (
     <Routes>
@@ -13,6 +14,9 @@ function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/changeemail" element={<ChangeEmail />} />
+
     </Routes>
   );
 }
