@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
   LineChart,
   Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
@@ -14,7 +15,8 @@ import {
   Cell,
 } from "recharts";
 import Sentiment from "sentiment";
-import { CSVLink } from "react-csv"; // Import CSVLink for CSV export
+import { CSVLink } from "react-csv";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const YouTubeAnalytics = () => {
   const [videoURL, setVideoURL] = useState("");
@@ -38,9 +40,12 @@ const YouTubeAnalytics = () => {
   const [selectedComponents, setSelectedComponents] = useState([]);
   const [comments, setComments] = useState([]);
   const [sentimentData, setSentimentData] = useState([]);
-  const sentimentAnalyzer = new Sentiment();
   const [showPlayer, setShowPlayer] = useState(false);
   const [currentVideoId, setCurrentVideoId] = useState(null);
+
+  // New states for video comparison
+  const [compareVideoURL, setCompareVideoURL] = useState("");
+  const [compareVideoData, setCompareVideoData] = useState(null);
 
   // Helper to format numbers with commas
   const formatNumber = (num) => {
@@ -51,6 +56,7 @@ const YouTubeAnalytics = () => {
   // Replace with your own API key
   const apiKey = "AIzaSyDBQAU6xAr29VabVv4vZfXj0rvFVoPchKk";
 
+  // Updated list with "Compare Videos"
   const componentsList = [
     { id: "channelStats", label: "Channel Stats" },
     { id: "videoStats", label: "Video Stats" },
@@ -58,7 +64,10 @@ const YouTubeAnalytics = () => {
     { id: "mostViewedVideos", label: "Most Viewed Videos" },
     { id: "mostRatedVideos", label: "Highly Rated Videos" },
     { id: "sentimentAnalysis", label: "Comment Sentiment Analysis" },
+    { id: "compareVideos", label: "Compare Videos" },
   ];
+
+  const sentimentAnalyzer = new Sentiment();
 
   const extractVideoID = (url) => {
     let match = url.match(
@@ -72,7 +81,9 @@ const YouTubeAnalytics = () => {
     const hours = match[1] ? parseInt(match[1]) : 0;
     const minutes = match[2] ? parseInt(match[2]) : 0;
     const seconds = match[3] ? parseInt(match[3]) : 0;
-    return `${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
+    return `${hours > 0 ? `${hours}h ` : ""}${
+      minutes > 0 ? `${minutes}m ` : ""
+    }${seconds}s`;
   };
 
   const calculateUploadFrequency = (channelData) => {
@@ -110,7 +121,7 @@ const YouTubeAnalytics = () => {
       );
       let videoData = await videoRes.json();
 
-      if (videoData.items.length > 0) {
+      if (videoData.items && videoData.items.length > 0) {
         let video = videoData.items[0];
 
         setVideoTitle(video.snippet.title);
@@ -132,8 +143,12 @@ const YouTubeAnalytics = () => {
         setVideoStats(video.statistics);
         setStatsHistory((prev) => [...prev, newStats]);
 
-        setCommentsPerView(views > 0 && comments > 0 ? Math.round(views / comments) : "N/A");
-        setEngagementRate(views > 0 ? ((likes + comments) / views).toFixed(4) : "N/A");
+        setCommentsPerView(
+          views > 0 && comments > 0 ? Math.round(views / comments) : "N/A"
+        );
+        setEngagementRate(
+          views > 0 ? ((likes + comments) / views).toFixed(4) : "N/A"
+        );
 
         let channelID = video.snippet.channelId;
         let channelRes = await fetch(
@@ -141,7 +156,7 @@ const YouTubeAnalytics = () => {
         );
         let channelData = await channelRes.json();
 
-        if (channelData.items.length > 0) {
+        if (channelData.items && channelData.items.length > 0) {
           let channel = channelData.items[0];
           setChannelStats(channel.statistics);
           setChannelName(channel.snippet.title);
@@ -154,26 +169,30 @@ const YouTubeAnalytics = () => {
             `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelID}&maxResults=4&order=viewCount&type=video&key=${apiKey}`
           );
           let videosData = await videosRes.json();
-          const viewedVideosWithDetails = await Promise.all(
-            videosData.items.map(async (video) => {
-              const details = await fetchVideoDetails(video.id.videoId);
-              return { ...video, views: details.views };
-            })
-          );
-          setMostViewedVideos(viewedVideosWithDetails);
+          if (videosData.items) {
+            const viewedVideosWithDetails = await Promise.all(
+              videosData.items.map(async (vid) => {
+                const details = await fetchVideoDetails(vid.id.videoId);
+                return { ...vid, views: details.views };
+              })
+            );
+            setMostViewedVideos(viewedVideosWithDetails);
+          }
 
           // Fetch 4 most liked videos (Highly Rated Videos)
           let likedVideosRes = await fetch(
             `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelID}&maxResults=4&order=rating&type=video&key=${apiKey}`
           );
           let likedVideosData = await likedVideosRes.json();
-          const likedVideosWithDetails = await Promise.all(
-            likedVideosData.items.map(async (video) => {
-              const details = await fetchVideoDetails(video.id.videoId);
-              return { ...video, likes: details.likes };
-            })
-          );
-          setMostLikedVideos(likedVideosWithDetails);
+          if (likedVideosData.items) {
+            const likedVideosWithDetails = await Promise.all(
+              likedVideosData.items.map(async (vid) => {
+                const details = await fetchVideoDetails(vid.id.videoId);
+                return { ...vid, likes: details.likes };
+              })
+            );
+            setMostLikedVideos(likedVideosWithDetails);
+          }
         }
       } else {
         alert("Invalid Video ID or no data found.");
@@ -223,6 +242,7 @@ const YouTubeAnalytics = () => {
     }
   }, [videoStats, selectedComponents]);
 
+  // Real-time tracking
   useEffect(() => {
     if (tracking) {
       const interval = setInterval(fetchStatistics, 30000);
@@ -230,6 +250,7 @@ const YouTubeAnalytics = () => {
     }
   }, [tracking]);
 
+  // Handler for Drag and Drop reordering
   const onDragEnd = (result) => {
     if (!result.destination) return;
     const items = Array.from(selectedComponents);
@@ -263,7 +284,29 @@ const YouTubeAnalytics = () => {
     { name: "Negative", value: sentimentSummary.negative, color: "#ff6961" },
   ];
 
-  // Handler to show the embedded video player for any video
+  // Compute chart data for video comparison
+  let comparisonChartData = [];
+  if (videoStats && compareVideoData) {
+    comparisonChartData = [
+      {
+        name: "Views",
+        primary: parseInt(videoStats.viewCount),
+        comparison: compareVideoData.views,
+      },
+      {
+        name: "Likes",
+        primary: parseInt(videoStats.likeCount),
+        comparison: compareVideoData.likes,
+      },
+      {
+        name: "Comments",
+        primary: parseInt(videoStats.commentCount),
+        comparison: compareVideoData.comments,
+      },
+    ];
+  }
+
+  // Handler to show the embedded video player
   const handleVideoClick = (videoId) => {
     setCurrentVideoId(videoId);
     setShowPlayer(true);
@@ -274,19 +317,27 @@ const YouTubeAnalytics = () => {
     setShowPlayer(false);
   };
 
-  // NEW: Generate CSV data by combining the available stats into an array of objects
+  // Generate CSV data
   const generateCSVData = () => {
     const data = [];
 
     if (channelStats && videoStats) {
       // Channel Stats
-      data.push({ Category: "Channel Stats", Field: "Channel Name", Value: channelName });
+      data.push({
+        Category: "Channel Stats",
+        Field: "Channel Name",
+        Value: channelName,
+      });
       data.push({
         Category: "Channel Stats",
         Field: "Subscribers",
         Value: channelStats.subscriberCount,
       });
-      data.push({ Category: "Channel Stats", Field: "Total Videos", Value: totalVideos });
+      data.push({
+        Category: "Channel Stats",
+        Field: "Total Videos",
+        Value: totalVideos,
+      });
       data.push({
         Category: "Channel Stats",
         Field: "Total Views",
@@ -299,7 +350,11 @@ const YouTubeAnalytics = () => {
       });
 
       // Video Stats
-      data.push({ Category: "Video Stats", Field: "Video Title", Value: videoTitle });
+      data.push({
+        Category: "Video Stats",
+        Field: "Video Title",
+        Value: videoTitle,
+      });
       data.push({
         Category: "Video Stats",
         Field: "Views",
@@ -315,7 +370,11 @@ const YouTubeAnalytics = () => {
         Field: "Comments",
         Value: videoStats.commentCount,
       });
-      data.push({ Category: "Video Stats", Field: "Duration", Value: videoDuration });
+      data.push({
+        Category: "Video Stats",
+        Field: "Duration",
+        Value: videoDuration,
+      });
       data.push({
         Category: "Video Stats",
         Field: "Trending Tags",
@@ -367,6 +426,43 @@ const YouTubeAnalytics = () => {
     return data;
   };
 
+  // Create CSV headers so the columns appear as "Category | Field | Value"
+  const csvHeaders = [
+    { label: "Category", key: "Category" },
+    { label: "Field", key: "Field" },
+    { label: "Value", key: "Value" },
+  ];
+
+  // Fetch statistics for the comparison video
+  const fetchComparisonStats = async () => {
+    const videoID = extractVideoID(compareVideoURL);
+    if (!videoID) {
+      alert("Invalid comparison video link.");
+      return;
+    }
+    try {
+      let res = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${videoID}&key=${apiKey}`
+      );
+      let data = await res.json();
+      if (data.items && data.items.length > 0) {
+        let video = data.items[0];
+        const stats = {
+          title: video.snippet.title,
+          thumbnail: video.snippet.thumbnails.high.url,
+          views: parseInt(video.statistics.viewCount),
+          likes: parseInt(video.statistics.likeCount),
+          comments: parseInt(video.statistics.commentCount),
+        };
+        setCompareVideoData(stats);
+      } else {
+        alert("No data found for comparison video.");
+      }
+    } catch (error) {
+      console.error("Error fetching comparison video data:", error);
+    }
+  };
+
   return (
     <div className="container mt-4">
       <h2 className="mb-3 text-center">YouTube Analytics</h2>
@@ -394,6 +490,7 @@ const YouTubeAnalytics = () => {
         <div className="export-button text-center mb-3">
           <CSVLink
             data={generateCSVData()}
+            headers={csvHeaders}
             filename={"youtube_analytics_data.csv"}
             className="btn btn-secondary"
           >
@@ -468,13 +565,15 @@ const YouTubeAnalytics = () => {
               <div>
                 <h4 className="mb-2">{channelName}</h4>
                 <p>
-                  <strong>Subscribers:</strong> {formatNumber(channelStats.subscriberCount)}
+                  <strong>Subscribers:</strong>{" "}
+                  {formatNumber(channelStats.subscriberCount)}
                 </p>
                 <p>
                   <strong>Total Videos:</strong> {formatNumber(totalVideos)}
                 </p>
                 <p>
-                  <strong>Total Views:</strong> {formatNumber(channelStats.viewCount)}
+                  <strong>Total Views:</strong>{" "}
+                  {formatNumber(channelStats.viewCount)}
                 </p>
                 <p>
                   <strong>Upload Frequency:</strong> {uploadFrequency}
@@ -524,7 +623,10 @@ const YouTubeAnalytics = () => {
             <div className="card mt-4 p-3">
               <h4 className="text-center">Real-Time Engagement Metrics</h4>
               <ResponsiveContainer width="100%" height={350}>
-                <LineChart data={statsHistory} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <LineChart
+                  data={statsHistory}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="time" />
                   <YAxis domain={["dataMin", "dataMax + 5"]} allowDecimals={false} />
@@ -604,7 +706,14 @@ const YouTubeAnalytics = () => {
               <h4 className="text-center">Comment Sentiment Analysis</h4>
               <ResponsiveContainer width="100%" height={350}>
                 <PieChart>
-                  <Pie data={sentimentChartData} dataKey="value" cx="50%" cy="50%" outerRadius={100} label>
+                  <Pie
+                    data={sentimentChartData}
+                    dataKey="value"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    label
+                  >
                     {sentimentChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
@@ -613,6 +722,47 @@ const YouTubeAnalytics = () => {
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
+            </div>
+          )}
+
+          {selectedComponents.includes("compareVideos") && (
+            <div className="card mt-4 p-3">
+              <h4 className="text-center">Compare Videos</h4>
+              <input
+                type="text"
+                className="form-control mb-2"
+                placeholder="Enter YouTube Video Link for Comparison"
+                value={compareVideoURL}
+                onChange={(e) => setCompareVideoURL(e.target.value)}
+              />
+              <button className="btn btn-primary mb-3" onClick={fetchComparisonStats}>
+                Compare
+              </button>
+              {compareVideoData && videoStats && (
+                <ResponsiveContainer width="100%" height={350}>
+                  <BarChart
+                    data={comparisonChartData}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    {/* --- Using log scale to handle large differences --- */}
+                    <YAxis scale="log" domain={[1, "dataMax"]} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar
+                      dataKey="primary"
+                      fill="#8884d8"
+                      name={videoTitle || "Primary Video"}
+                    />
+                    <Bar
+                      dataKey="comparison"
+                      fill="#82ca9d"
+                      name={compareVideoData.title || "Comparison Video"}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           )}
         </div>

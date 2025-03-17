@@ -6,6 +6,7 @@ import Dashboard from "./pages/DashBoard";
 import Main from "./pages/Main"
 import Settings from "./pages/Settings";
 import ChangeEmail from "./pages/ChangeEmail";
+import Reauthenticate from "./pages/Reauthenticate"
 function App() {
   return (
     <Routes>
@@ -16,6 +17,7 @@ function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/changeemail" element={<ChangeEmail />} />
+      <Route path="/reauthenticate" element={<Reauthenticate />} />
 
     </Routes>
   );
