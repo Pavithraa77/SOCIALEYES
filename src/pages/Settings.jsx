@@ -109,11 +109,24 @@ const Settings = () => {
             <h3>Confirm Account Deletion</h3>
             <p>Are you sure you want to delete your account? This action cannot be undone.</p>
             <div className="modal-actions">
-              <button className="settings-btn" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-              <button className="settings-btn danger" onClick={handleAccountDeletion} disabled={loading}>
-                {loading ? "Deleting..." : "Delete"}
-              </button>
-            </div>
+  <button
+    className="settings-btn"
+    onClick={() => {
+      // Close the delete modal AND reset loading
+      setShowDeleteModal(false);
+      setLoading(false);
+    }}
+  >
+    Cancel
+  </button>
+  <button
+    className="settings-btn danger"
+    onClick={handleAccountDeletion}
+    disabled={loading}
+  >
+    {loading ? "Deleting..." : "Delete"}
+  </button>
+</div>
           </div>
         </div>
       )}
