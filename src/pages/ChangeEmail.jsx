@@ -54,8 +54,12 @@ function ChangeEmail() {
     try {
       if (!currentUser?.email) throw new Error("User not authenticated.");
       if (!currentUser.emailVerified) throw new Error("Please verify your current email first.");
-      if (!newEmail.endsWith("@gmail.com")) throw new Error("You can only change your email to another Gmail account.");
-  
+
+      // Validation for email format based on authentication provider
+      if (!isEmailUser && !newEmail.endsWith("@gmail.com")) {
+        throw new Error("Google users can only switch to another Gmail account.");
+      }
+
       setIsUpdating(true);
   
       // Reauthenticate based on provider
@@ -84,9 +88,6 @@ function ChangeEmail() {
       setIsUpdating(false);
     }
   };
-  
-  
-  
 
   if (isVerifying) {
     return (
