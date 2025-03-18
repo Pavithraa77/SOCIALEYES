@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { auth } from "../config/firebase";
-import {
-  reauthenticateWithCredential,
-  EmailAuthProvider,
-  verifyBeforeUpdateEmail,
-  applyActionCode,
+import { 
+  reauthenticateWithCredential, 
+  EmailAuthProvider, 
+  verifyBeforeUpdateEmail, 
+  applyActionCode, 
   GoogleAuthProvider,
+  signInWithPopup
 } from "firebase/auth";
+
 import "../css/ChangeEmail.css";
 
 function ChangeEmail() {
@@ -48,27 +50,30 @@ function ChangeEmail() {
     e.preventDefault();
     setError("");
     setSuccess("");
-
+  
     try {
       if (!currentUser?.email) throw new Error("User not authenticated.");
       if (!currentUser.emailVerified) throw new Error("Please verify your current email first.");
-
+  
       setIsUpdating(true);
-
+  
       // Reauthenticate based on provider
       if (isEmailUser) {
         if (!password) throw new Error("Please enter your current password.");
         const credential = EmailAuthProvider.credential(currentUser.email, password);
         await reauthenticateWithCredential(currentUser, credential);
       } else {
-        // For Google/OAuth providers
+        // Correctly use signInWithPopup
         const provider = new GoogleAuthProvider();
-        await currentUser.reauthenticateWithPopup(provider);
+        const result = await signInWithPopup(auth, provider);
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (!credential) throw new Error("Failed to get credentials for reauthentication.");
+        await reauthenticateWithCredential(currentUser, credential);
       }
-
+  
       await verifyBeforeUpdateEmail(currentUser, newEmail);
       setSuccess(`Verification link sent to ${newEmail}. Check your inbox.`);
-      
+  
       setNewEmail("");
       setPassword("");
       setTimeout(() => navigate("/login"), 3000);
@@ -78,6 +83,8 @@ function ChangeEmail() {
       setIsUpdating(false);
     }
   };
+  
+  
 
   if (isVerifying) {
     return (
