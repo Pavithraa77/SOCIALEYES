@@ -54,6 +54,7 @@ function ChangeEmail() {
     try {
       if (!currentUser?.email) throw new Error("User not authenticated.");
       if (!currentUser.emailVerified) throw new Error("Please verify your current email first.");
+      if (!newEmail.endsWith("@gmail.com")) throw new Error("You can only change your email to another Gmail account.");
   
       setIsUpdating(true);
   
@@ -63,7 +64,7 @@ function ChangeEmail() {
         const credential = EmailAuthProvider.credential(currentUser.email, password);
         await reauthenticateWithCredential(currentUser, credential);
       } else {
-        // Correctly use signInWithPopup
+        // Ensure Google users can only switch to another Gmail account
         const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
         const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -83,6 +84,7 @@ function ChangeEmail() {
       setIsUpdating(false);
     }
   };
+  
   
   
 

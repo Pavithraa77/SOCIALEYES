@@ -46,6 +46,8 @@ const YouTubeAnalytics = () => {
   // New states for video comparison
   const [compareVideoURL, setCompareVideoURL] = useState("");
   const [compareVideoData, setCompareVideoData] = useState(null);
+  // New state for the comparison video's sentiment analysis
+  const [compareSentimentData, setCompareSentimentData] = useState([]);
 
   // Helper to format numbers with commas
   const formatNumber = (num) => {
@@ -81,9 +83,7 @@ const YouTubeAnalytics = () => {
     const hours = match[1] ? parseInt(match[1]) : 0;
     const minutes = match[2] ? parseInt(match[2]) : 0;
     const seconds = match[3] ? parseInt(match[3]) : 0;
-    return `${hours > 0 ? `${hours}h ` : ""}${
-      minutes > 0 ? `${minutes}m ` : ""
-    }${seconds}s`;
+    return `${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
   };
 
   const calculateUploadFrequency = (channelData) => {
@@ -204,7 +204,7 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // Fetch sentiment analysis for video comments
+  // Fetch sentiment analysis for primary video comments
   const fetchSentimentAnalysis = async () => {
     let videoID = extractVideoID(videoURL);
     if (!videoID) {
@@ -235,7 +235,37 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // When sentiment analysis is selected and videoStats updates, fetch sentiment data
+  // New function to fetch sentiment analysis for comparison video comments
+  const fetchComparisonSentimentAnalysis = async () => {
+    const videoID = extractVideoID(compareVideoURL);
+    if (!videoID) {
+      alert("Invalid comparison video link for sentiment analysis.");
+      return;
+    }
+    try {
+      const commentsRes = await fetch(
+        `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoID}&key=${apiKey}&maxResults=1000`
+      );
+      const commentsData = await commentsRes.json();
+      if (commentsData.items && commentsData.items.length > 0) {
+        const fetchedComments = commentsData.items.map(
+          (item) => item.snippet.topLevelComment.snippet.textDisplay
+        );
+        const sentimentResults = fetchedComments.map((comment) => {
+          const analysis = sentimentAnalyzer.analyze(comment);
+          return { comment, score: analysis.score };
+        });
+        setCompareSentimentData(sentimentResults);
+      } else {
+        alert("No comments found for this comparison video.");
+        setCompareSentimentData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching sentiment data for comparison video:", error);
+    }
+  };
+
+  // When sentiment analysis is selected and videoStats updates, fetch primary video sentiment data
   useEffect(() => {
     if (selectedComponents.includes("sentimentAnalysis") && videoStats) {
       fetchSentimentAnalysis();
@@ -267,7 +297,7 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // Compute summary data for sentiment chart
+  // Compute summary data for primary video sentiment chart
   const sentimentSummary = sentimentData.reduce(
     (acc, { score }) => {
       if (score > 0) acc.positive++;
@@ -282,6 +312,23 @@ const YouTubeAnalytics = () => {
     { name: "Positive", value: sentimentSummary.positive, color: "#82ca9d" },
     { name: "Neutral", value: sentimentSummary.neutral, color: "#8884d8" },
     { name: "Negative", value: sentimentSummary.negative, color: "#ff6961" },
+  ];
+
+  // Compute summary data for comparison video sentiment chart
+  const compareSentimentSummary = compareSentimentData.reduce(
+    (acc, { score }) => {
+      if (score > 0) acc.positive++;
+      else if (score < 0) acc.negative++;
+      else acc.neutral++;
+      return acc;
+    },
+    { positive: 0, negative: 0, neutral: 0 }
+  );
+
+  const compareSentimentChartData = [
+    { name: "Positive", value: compareSentimentSummary.positive, color: "#82ca9d" },
+    { name: "Neutral", value: compareSentimentSummary.neutral, color: "#8884d8" },
+    { name: "Negative", value: compareSentimentSummary.negative, color: "#ff6961" },
   ];
 
   // Compute chart data for video comparison
@@ -305,6 +352,42 @@ const YouTubeAnalytics = () => {
       },
     ];
   }
+
+  // New handler to fetch both comparison stats and sentiment analysis
+  const handleCompare = async () => {
+    await fetchComparisonStats();
+    await fetchComparisonSentimentAnalysis();
+  };
+
+  // Fetch statistics for the comparison video
+  const fetchComparisonStats = async () => {
+    const videoID = extractVideoID(compareVideoURL);
+    if (!videoID) {
+      alert("Invalid comparison video link.");
+      return;
+    }
+    try {
+      let res = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${videoID}&key=${apiKey}`
+      );
+      let data = await res.json();
+      if (data.items && data.items.length > 0) {
+        let video = data.items[0];
+        const stats = {
+          title: video.snippet.title,
+          thumbnail: video.snippet.thumbnails.high.url,
+          views: parseInt(video.statistics.viewCount),
+          likes: parseInt(video.statistics.likeCount),
+          comments: parseInt(video.statistics.commentCount),
+        };
+        setCompareVideoData(stats);
+      } else {
+        alert("No data found for comparison video.");
+      }
+    } catch (error) {
+      console.error("Error fetching comparison video data:", error);
+    }
+  };
 
   // Handler to show the embedded video player
   const handleVideoClick = (videoId) => {
@@ -432,36 +515,6 @@ const YouTubeAnalytics = () => {
     { label: "Field", key: "Field" },
     { label: "Value", key: "Value" },
   ];
-
-  // Fetch statistics for the comparison video
-  const fetchComparisonStats = async () => {
-    const videoID = extractVideoID(compareVideoURL);
-    if (!videoID) {
-      alert("Invalid comparison video link.");
-      return;
-    }
-    try {
-      let res = await fetch(
-        `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${videoID}&key=${apiKey}`
-      );
-      let data = await res.json();
-      if (data.items && data.items.length > 0) {
-        let video = data.items[0];
-        const stats = {
-          title: video.snippet.title,
-          thumbnail: video.snippet.thumbnails.high.url,
-          views: parseInt(video.statistics.viewCount),
-          likes: parseInt(video.statistics.likeCount),
-          comments: parseInt(video.statistics.commentCount),
-        };
-        setCompareVideoData(stats);
-      } else {
-        alert("No data found for comparison video.");
-      }
-    } catch (error) {
-      console.error("Error fetching comparison video data:", error);
-    }
-  };
 
   return (
     <div className="container mt-4">
@@ -735,33 +788,79 @@ const YouTubeAnalytics = () => {
                 value={compareVideoURL}
                 onChange={(e) => setCompareVideoURL(e.target.value)}
               />
-              <button className="btn btn-primary mb-3" onClick={fetchComparisonStats}>
+              <button className="btn btn-primary mb-3" onClick={handleCompare}>
                 Compare
               </button>
               {compareVideoData && videoStats && (
-                <ResponsiveContainer width="100%" height={350}>
-                  <BarChart
-                    data={comparisonChartData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    {/* --- Using log scale to handle large differences --- */}
-                    <YAxis scale="log" domain={[1, "dataMax"]} />
-                    <Tooltip />
-                    <Legend />
-                    <Bar
-                      dataKey="primary"
-                      fill="#8884d8"
-                      name={videoTitle || "Primary Video"}
-                    />
-                    <Bar
-                      dataKey="comparison"
-                      fill="#82ca9d"
-                      name={compareVideoData.title || "Comparison Video"}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                <>
+                  <ResponsiveContainer width="100%" height={350}>
+                    <BarChart
+                      data={comparisonChartData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      {/* --- Using log scale to handle large differences --- */}
+                      <YAxis scale="log" domain={[1, "dataMax"]} />
+                      <Tooltip />
+                      <Legend />
+                      <Bar
+                        dataKey="primary"
+                        fill="#8884d8"
+                        name={videoTitle || "Primary Video"}
+                      />
+                      <Bar
+                        dataKey="comparison"
+                        fill="#82ca9d"
+                        name={compareVideoData.title || "Comparison Video"}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <div className="row mt-4">
+                    <div className="col-md-6">
+                      <h5 className="text-center">Primary Video Sentiment Analysis</h5>
+                      <ResponsiveContainer width="100%" height={350}>
+                        <PieChart>
+                          <Pie
+                            data={sentimentChartData}
+                            dataKey="value"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={100}
+                            label
+                          >
+                            {sentimentChartData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="col-md-6">
+                      <h5 className="text-center">Comparison Video Sentiment Analysis</h5>
+                      <ResponsiveContainer width="100%" height={350}>
+                        <PieChart>
+                          <Pie
+                            data={compareSentimentChartData}
+                            dataKey="value"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={100}
+                            label
+                          >
+                            {compareSentimentChartData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           )}
