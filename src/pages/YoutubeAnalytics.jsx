@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -18,7 +18,145 @@ import Sentiment from "sentiment";
 import { CSVLink } from "react-csv";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-const YouTubeAnalytics = () => {
+// --------------------------------------
+// Replace this with your actual YouTube API key
+// --------------------------------------
+const apiKey = "AIzaSyDBQAU6xAr29VabVv4vZfXj0rvFVoPchKk";
+
+// Helper to extract a YouTube video ID from various link formats
+const extractVideoID = (url) => {
+  let match = url.match(
+    /(?:v=|\/|shorts\/|embed\/|youtu\.be\/|\/v\/|\/e\/|watch\?v=|&v=|vi\/|\/user\/[^/]+\/|\/channel\/[^/]+\/)([0-9A-Za-z_-]{11})/
+  );
+  return match ? match[1] : null;
+};
+
+// --------------------------------------
+// Engagement Rate Checker
+// (Now uses the main video URL passed in from parent)
+// --------------------------------------
+function EngagementRateChecker({ videoURL }) {
+  const [compareDate, setCompareDate] = useState("");
+  const [result, setResult] = useState(null);
+
+  const fetchVideoStats = async () => {
+    // Ensure we have a date and a main video URL from parent
+    if (!videoURL || !compareDate) {
+      alert("Please enter a valid date and main video URL above.");
+      return;
+    }
+
+    const videoId = extractVideoID(videoURL);
+    const dateObj = new Date(compareDate);
+
+    if (!videoId || isNaN(dateObj.getTime())) {
+      alert("Please enter a valid date and main video URL above.");
+      return;
+    }
+
+    try {
+      const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${apiKey}`;
+      let response = await fetch(url);
+      let data = await response.json();
+
+      if (!data.items || !data.items.length) {
+        setResult("Invalid Video URL or No Data Available.");
+        return;
+      }
+
+      let video = data.items[0];
+      let publishedAt = new Date(video.snippet.publishedAt);
+      let views = parseInt(video.statistics.viewCount || 0, 10);
+      let likes = parseInt(video.statistics.likeCount || 0, 10);
+      let comments = parseInt(video.statistics.commentCount || 0, 10);
+
+      let engagementRate = 0;
+      if (views > 0) {
+        engagementRate = ((likes + comments) / views) * 100;
+      }
+
+      // "Before" if published date < compareDate; otherwise "N/A"
+      let engagementBefore =
+        publishedAt < dateObj ? `${engagementRate.toFixed(2)}%` : "N/A";
+
+      // "After" if published date >= compareDate; otherwise "N/A"
+      let engagementAfter =
+        publishedAt >= dateObj ? `${engagementRate.toFixed(2)}%` : "N/A";
+
+      setResult({
+        title: video.snippet.title,
+        publishedAt: video.snippet.publishedAt,
+        views,
+        likes,
+        comments,
+        engagementBefore,
+        engagementAfter,
+        dateStr: compareDate,
+      });
+    } catch (error) {
+      console.error("Error fetching video data:", error);
+      setResult("Error fetching video data.");
+    }
+  };
+
+  return (
+    <div className="card p-3 mt-4">
+      <h4 className="text-center">YouTube Engagement Rate Checker</h4>
+      <div className="d-flex flex-column align-items-center">
+        {/* Only the date input remains here */}
+        <input
+          type="date"
+          value={compareDate}
+          onChange={(e) => setCompareDate(e.target.value)}
+          className="form-control my-2"
+          style={{ maxWidth: 400 }}
+        />
+        <button className="btn btn-primary my-2" onClick={fetchVideoStats}>
+          Compare Engagement
+        </button>
+      </div>
+
+      {result && typeof result === "object" && (
+        <div className="mt-3" style={{ textAlign: "left" }}>
+          <p>
+            <strong>Video Title:</strong> {result.title}
+          </p>
+          <p>
+            <strong>Published At:</strong> {result.publishedAt}
+          </p>
+          <p>
+            <strong>Views:</strong> {result.views}
+          </p>
+          <p>
+            <strong>Likes:</strong> {result.likes}
+          </p>
+          <p>
+            <strong>Comments:</strong> {result.comments}
+          </p>
+          <p>
+            <strong>Engagement Rate Before {result.dateStr}:</strong>{" "}
+            {result.engagementBefore}
+          </p>
+          <p>
+            <strong>Engagement Rate After {result.dateStr}:</strong>{" "}
+            {result.engagementAfter}
+          </p>
+        </div>
+      )}
+
+      {typeof result === "string" && (
+        <div className="mt-3">
+          <p>{result}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// --------------------------------------
+// Main YouTubeAnalytics Component
+// --------------------------------------
+function YouTubeAnalytics() {
   const [videoURL, setVideoURL] = useState("");
   const [channelStats, setChannelStats] = useState(null);
   const [videoStats, setVideoStats] = useState(null);
@@ -46,19 +184,12 @@ const YouTubeAnalytics = () => {
   // New states for video comparison
   const [compareVideoURL, setCompareVideoURL] = useState("");
   const [compareVideoData, setCompareVideoData] = useState(null);
-  // New state for the comparison video's sentiment analysis
   const [compareSentimentData, setCompareSentimentData] = useState([]);
 
-  // Helper to format numbers with commas
-  const formatNumber = (num) => {
-    if (isNaN(num)) return num;
-    return Number(num).toLocaleString();
-  };
+  // For sentiment analysis
+  const sentimentAnalyzer = new Sentiment();
 
-  // Replace with your own API key
-  const apiKey = "AIzaSyDBQAU6xAr29VabVv4vZfXj0rvFVoPchKk";
-
-  // Updated list with "Compare Videos"
+  // Updated list includes "Engagement Rate Checker"
   const componentsList = [
     { id: "channelStats", label: "Channel Stats" },
     { id: "videoStats", label: "Video Stats" },
@@ -67,38 +198,41 @@ const YouTubeAnalytics = () => {
     { id: "mostRatedVideos", label: "Highly Rated Videos" },
     { id: "sentimentAnalysis", label: "Comment Sentiment Analysis" },
     { id: "compareVideos", label: "Compare Videos" },
+    { id: "engagementChecker", label: "Engagement Rate Checker" },
   ];
 
-  const sentimentAnalyzer = new Sentiment();
-
-  const extractVideoID = (url) => {
-    let match = url.match(
-      /(?:v=|\/|shorts\/|embed\/|youtu\.be\/|\/v\/|\/e\/|watch\?v=|&v=|vi\/|\/user\/[^/]+\/|\/channel\/[^/]+\/)([0-9A-Za-z_-]{11})/
-    );
-    return match ? match[1] : null;
+  // Format numbers with commas
+  const formatNumber = (num) => {
+    if (isNaN(num)) return num;
+    return Number(num).toLocaleString();
   };
 
+  // Format YouTube durations (e.g., PT10M15S -> 10m 15s)
   const formatDuration = (duration) => {
     const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
     const hours = match[1] ? parseInt(match[1]) : 0;
     const minutes = match[2] ? parseInt(match[2]) : 0;
     const seconds = match[3] ? parseInt(match[3]) : 0;
-    return `${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
+    return `${hours > 0 ? `${hours}h ` : ""}${
+      minutes > 0 ? `${minutes}m ` : ""
+    }${seconds}s`;
   };
 
+  // Calculate how frequently the channel uploads
   const calculateUploadFrequency = (channelData) => {
-    const totalVideos = parseInt(channelData.statistics.videoCount);
+    const totalVids = parseInt(channelData.statistics.videoCount, 10);
     const channelCreationDate = new Date(channelData.snippet.publishedAt);
     const currentDate = new Date();
     const timeDiff = currentDate - channelCreationDate;
     const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-    const avgDaysPerVideo = (daysDiff / totalVideos).toFixed(1);
+    const avgDaysPerVideo = (daysDiff / totalVids).toFixed(1);
     return `approximately uploads video once in every ${avgDaysPerVideo} days`;
   };
 
-  const fetchVideoDetails = async (videoId) => {
+  // Fetch stats for a single video ID (used for "most viewed" / "most liked" fetches)
+  const fetchVideoDetails = async (vidId) => {
     const res = await fetch(
-      `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${apiKey}`
+      `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${vidId}&key=${apiKey}`
     );
     const data = await res.json();
     return {
@@ -107,6 +241,7 @@ const YouTubeAnalytics = () => {
     };
   };
 
+  // Fetch main video stats
   const fetchStatistics = async () => {
     let videoID = extractVideoID(videoURL);
     if (!videoID) {
@@ -129,15 +264,15 @@ const YouTubeAnalytics = () => {
         setVideoDuration(formatDuration(video.contentDetails.duration));
         setTrendingTags(video.snippet.tags || []);
 
-        const views = parseInt(video.statistics.viewCount);
-        const likes = parseInt(video.statistics.likeCount);
-        const comments = parseInt(video.statistics.commentCount);
+        const views = parseInt(video.statistics.viewCount, 10);
+        const likes = parseInt(video.statistics.likeCount, 10);
+        const comments = parseInt(video.statistics.commentCount, 10);
 
         const newStats = {
           time: new Date().toLocaleTimeString(),
-          views: views,
-          likes: likes,
-          comments: comments,
+          views,
+          likes,
+          comments,
         };
 
         setVideoStats(video.statistics);
@@ -204,7 +339,7 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // Fetch sentiment analysis for primary video comments
+  // Fetch sentiment analysis for the primary video
   const fetchSentimentAnalysis = async () => {
     let videoID = extractVideoID(videoURL);
     if (!videoID) {
@@ -235,7 +370,7 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // New function to fetch sentiment analysis for comparison video comments
+  // Fetch sentiment for comparison video
   const fetchComparisonSentimentAnalysis = async () => {
     const videoID = extractVideoID(compareVideoURL);
     if (!videoID) {
@@ -265,9 +400,13 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // When sentiment analysis is selected and videoStats updates, fetch primary video sentiment data
+  // Auto-fetch sentiment for primary if user selects "sentimentAnalysis" or "compareVideos"
   useEffect(() => {
-    if (selectedComponents.includes("sentimentAnalysis") && videoStats) {
+    if (
+      (selectedComponents.includes("sentimentAnalysis") ||
+        selectedComponents.includes("compareVideos")) &&
+      videoStats
+    ) {
       fetchSentimentAnalysis();
     }
   }, [videoStats, selectedComponents]);
@@ -280,7 +419,7 @@ const YouTubeAnalytics = () => {
     }
   }, [tracking]);
 
-  // Handler for Drag and Drop reordering
+  // Drag & Drop reordering
   const onDragEnd = (result) => {
     if (!result.destination) return;
     const items = Array.from(selectedComponents);
@@ -297,7 +436,7 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // Compute summary data for primary video sentiment chart
+  // Summaries for the sentiment charts
   const sentimentSummary = sentimentData.reduce(
     (acc, { score }) => {
       if (score > 0) acc.positive++;
@@ -314,7 +453,6 @@ const YouTubeAnalytics = () => {
     { name: "Negative", value: sentimentSummary.negative, color: "#ff6961" },
   ];
 
-  // Compute summary data for comparison video sentiment chart
   const compareSentimentSummary = compareSentimentData.reduce(
     (acc, { score }) => {
       if (score > 0) acc.positive++;
@@ -331,35 +469,35 @@ const YouTubeAnalytics = () => {
     { name: "Negative", value: compareSentimentSummary.negative, color: "#ff6961" },
   ];
 
-  // Compute chart data for video comparison
+  // Comparison chart data
   let comparisonChartData = [];
   if (videoStats && compareVideoData) {
     comparisonChartData = [
       {
         name: "Views",
-        primary: parseInt(videoStats.viewCount),
+        primary: parseInt(videoStats.viewCount, 10),
         comparison: compareVideoData.views,
       },
       {
         name: "Likes",
-        primary: parseInt(videoStats.likeCount),
+        primary: parseInt(videoStats.likeCount, 10),
         comparison: compareVideoData.likes,
       },
       {
         name: "Comments",
-        primary: parseInt(videoStats.commentCount),
+        primary: parseInt(videoStats.commentCount, 10),
         comparison: compareVideoData.comments,
       },
     ];
   }
 
-  // New handler to fetch both comparison stats and sentiment analysis
+  // Compare videos
   const handleCompare = async () => {
     await fetchComparisonStats();
     await fetchComparisonSentimentAnalysis();
   };
 
-  // Fetch statistics for the comparison video
+  // Fetch stats for comparison video
   const fetchComparisonStats = async () => {
     const videoID = extractVideoID(compareVideoURL);
     if (!videoID) {
@@ -376,9 +514,9 @@ const YouTubeAnalytics = () => {
         const stats = {
           title: video.snippet.title,
           thumbnail: video.snippet.thumbnails.high.url,
-          views: parseInt(video.statistics.viewCount),
-          likes: parseInt(video.statistics.likeCount),
-          comments: parseInt(video.statistics.commentCount),
+          views: parseInt(video.statistics.viewCount, 10),
+          likes: parseInt(video.statistics.likeCount, 10),
+          comments: parseInt(video.statistics.commentCount, 10),
         };
         setCompareVideoData(stats);
       } else {
@@ -389,21 +527,18 @@ const YouTubeAnalytics = () => {
     }
   };
 
-  // Handler to show the embedded video player
+  // Video Player Modal
   const handleVideoClick = (videoId) => {
     setCurrentVideoId(videoId);
     setShowPlayer(true);
   };
-
-  // Handler to close the embedded video player
   const closePlayer = () => {
     setShowPlayer(false);
   };
 
-  // Generate CSV data
+  // CSV export
   const generateCSVData = () => {
     const data = [];
-
     if (channelStats && videoStats) {
       // Channel Stats
       data.push({
@@ -464,7 +599,7 @@ const YouTubeAnalytics = () => {
         Value: trendingTags.join(", "),
       });
 
-      // Real-Time Engagement Metrics History
+      // Real-Time Engagement Metrics
       statsHistory.forEach((record, index) => {
         data.push({
           Category: "Engagement Metrics",
@@ -505,11 +640,9 @@ const YouTubeAnalytics = () => {
         Value: sentimentSummary.negative,
       });
     }
-
     return data;
   };
 
-  // Create CSV headers so the columns appear as "Category | Field | Value"
   const csvHeaders = [
     { label: "Category", key: "Category" },
     { label: "Field", key: "Field" },
@@ -519,6 +652,7 @@ const YouTubeAnalytics = () => {
   return (
     <div className="container mt-4">
       <h2 className="mb-3 text-center">YouTube Analytics</h2>
+      {/* Single input for the main video URL */}
       <input
         type="text"
         className="form-control mb-2"
@@ -526,6 +660,7 @@ const YouTubeAnalytics = () => {
         value={videoURL}
         onChange={(e) => setVideoURL(e.target.value)}
       />
+
       <div className="d-flex justify-content-center mb-3">
         <button className="btn btn-primary me-2" onClick={fetchStatistics}>
           Show Statistics
@@ -618,15 +753,13 @@ const YouTubeAnalytics = () => {
               <div>
                 <h4 className="mb-2">{channelName}</h4>
                 <p>
-                  <strong>Subscribers:</strong>{" "}
-                  {formatNumber(channelStats.subscriberCount)}
+                  <strong>Subscribers:</strong> {formatNumber(channelStats.subscriberCount)}
                 </p>
                 <p>
                   <strong>Total Videos:</strong> {formatNumber(totalVideos)}
                 </p>
                 <p>
-                  <strong>Total Views:</strong>{" "}
-                  {formatNumber(channelStats.viewCount)}
+                  <strong>Total Views:</strong> {formatNumber(channelStats.viewCount)}
                 </p>
                 <p>
                   <strong>Upload Frequency:</strong> {uploadFrequency}
@@ -800,7 +933,7 @@ const YouTubeAnalytics = () => {
                     >
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
-                      {/* --- Using log scale to handle large differences --- */}
+                      {/* Use log scale to handle large differences */}
                       <YAxis scale="log" domain={[1, "dataMax"]} />
                       <Tooltip />
                       <Legend />
@@ -839,7 +972,9 @@ const YouTubeAnalytics = () => {
                       </ResponsiveContainer>
                     </div>
                     <div className="col-md-6">
-                      <h5 className="text-center">Comparison Video Sentiment Analysis</h5>
+                      <h5 className="text-center">
+                        Comparison Video Sentiment Analysis
+                      </h5>
                       <ResponsiveContainer width="100%" height={350}>
                         <PieChart>
                           <Pie
@@ -867,7 +1002,12 @@ const YouTubeAnalytics = () => {
         </div>
       )}
 
-      {/* --- Embedded Video Player Modal --- */}
+      {/* Show the EngagementRateChecker if selected, passing the parent's videoURL */}
+      {selectedComponents.includes("engagementChecker") && (
+        <EngagementRateChecker videoURL={videoURL} />
+      )}
+
+      {/* Embedded Video Player Modal */}
       {showPlayer && currentVideoId && (
         <div
           className="video-modal"
@@ -925,6 +1065,6 @@ const YouTubeAnalytics = () => {
       )}
     </div>
   );
-};
+}
 
 export default YouTubeAnalytics;

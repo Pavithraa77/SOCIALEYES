@@ -17,17 +17,22 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setMessage(""); // Clear previous messages
-
+  
+    // ✅ Prevent form submission if email or password is empty
+    if (!email.trim() || !password.trim()) {
+      setMessage("Email and password are required!");
+      return;
+    }
+  
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
-      // Check if the email is verified before allowing login
+  
       if (!user.emailVerified) {
         setMessage("Please verify your email before logging in.");
         return;
       }
-
+  
       navigate("/dashboard"); // Redirect after successful login
     } catch (error) {
       handleAuthErrors(error.code);
@@ -85,7 +90,7 @@ const Login = () => {
               placeholder="Enter email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
+              
             />
           </div>
           <div className="mb-3">
@@ -96,7 +101,7 @@ const Login = () => {
               placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
+              
             />
           </div>
           <button type="submit" className="login-btn">

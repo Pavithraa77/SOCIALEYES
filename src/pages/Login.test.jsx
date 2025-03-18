@@ -17,28 +17,31 @@ jest.mock("../config/firebase", () => ({
   auth: {},
 }));
 
-const MockLogin = () => (
-  <BrowserRouter>
-    <Login />
-  </BrowserRouter>
-);
+const MockLogin = () => {
+  return (
+    <BrowserRouter>
+      <Login />
+    </BrowserRouter>
+  );
+};
 
 describe("Login Component", () => {
   test("renders login form", () => {
     render(<MockLogin />);
 
-    expect(screen.getByText("Login")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /login/i })).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Enter email")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Enter password")).toBeInTheDocument();
-    expect(screen.getByText("Login")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /login/i })).toBeInTheDocument();
   });
 
   test("displays error when email or password is empty", async () => {
     render(<MockLogin />);
 
-    fireEvent.click(screen.getByText("Login"));
+    fireEvent.click(screen.getByRole("button", { name: /login/i }));
 
-    expect(await screen.findByText("Email and password are required!")).toBeInTheDocument();
+    // ✅ Updated: Use a more flexible matcher for finding error message
+    expect(await screen.findByText(/email and password are required/i)).toBeInTheDocument();
   });
 
   test("calls signInWithEmailAndPassword with correct credentials", async () => {
@@ -53,7 +56,7 @@ describe("Login Component", () => {
     fireEvent.change(screen.getByPlaceholderText("Enter password"), {
       target: { value: "password123" },
     });
-    fireEvent.click(screen.getByText("Login"));
+    fireEvent.click(screen.getByRole("button", { name: /login/i }));
 
     await waitFor(() => {
       expect(signInWithEmailAndPassword).toHaveBeenCalledWith(auth, "test@example.com", "password123");
@@ -72,9 +75,9 @@ describe("Login Component", () => {
     fireEvent.change(screen.getByPlaceholderText("Enter password"), {
       target: { value: "password123" },
     });
-    fireEvent.click(screen.getByText("Login"));
+    fireEvent.click(screen.getByRole("button", { name: /login/i }));
 
-    expect(await screen.findByText("Please verify your email before logging in.")).toBeInTheDocument();
+    expect(await screen.findByText(/please verify your email before logging in/i)).toBeInTheDocument();
   });
 
   test("displays error message on invalid credentials", async () => {
@@ -88,9 +91,9 @@ describe("Login Component", () => {
     fireEvent.change(screen.getByPlaceholderText("Enter password"), {
       target: { value: "wrongpass" },
     });
-    fireEvent.click(screen.getByText("Login"));
+    fireEvent.click(screen.getByRole("button", { name: /login/i }));
 
-    expect(await screen.findByText("Incorrect password. Please try again.")).toBeInTheDocument();
+    expect(await screen.findByText(/incorrect password. please try again/i)).toBeInTheDocument();
   });
 
   test("calls signInWithPopup for Google login", async () => {
@@ -98,7 +101,7 @@ describe("Login Component", () => {
 
     render(<MockLogin />);
 
-    fireEvent.click(screen.getByText("Sign in with Google"));
+    fireEvent.click(screen.getByRole("button", { name: /sign in with google/i }));
 
     await waitFor(() => {
       expect(signInWithPopup).toHaveBeenCalledWith(auth, expect.any(GoogleAuthProvider));
