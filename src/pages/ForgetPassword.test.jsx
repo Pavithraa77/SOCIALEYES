@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import ForgotPassword from "../components/ForgotPassword";
+import ForgotPassword from "../pages/ForgetPassword";
 import { auth } from "../config/firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 
@@ -24,9 +24,7 @@ describe("ForgotPassword Component", () => {
     expect(screen.getByPlaceholderText(/Enter your email/i)).toBeInTheDocument();
   });
 
-  test("shows alert if email field is empty on submit", () => {
-    window.alert = jest.fn();
-
+  test("shows validation message if email field is empty", async () => {
     render(
       <MemoryRouter>
         <ForgotPassword />
@@ -35,7 +33,9 @@ describe("ForgotPassword Component", () => {
 
     fireEvent.click(screen.getByText(/Send Reset Link/i));
 
-    expect(window.alert).toHaveBeenCalledWith("Please enter your email");
+    await waitFor(() => {
+      expect(screen.getByText("Please enter your email")).toBeInTheDocument();
+    });
   });
 
   test("handles successful password reset request", async () => {
@@ -57,8 +57,7 @@ describe("ForgotPassword Component", () => {
     expect(await screen.findByText(/Password reset link sent!/i)).toBeInTheDocument();
   });
 
-  test("shows alert for Firebase error", async () => {
-    window.alert = jest.fn();
+  test("displays error message for Firebase error", async () => {
     sendPasswordResetEmail.mockRejectedValue(new Error("Firebase error message"));
 
     render(
@@ -71,7 +70,7 @@ describe("ForgotPassword Component", () => {
     fireEvent.click(screen.getByText(/Send Reset Link/i));
 
     await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith("Firebase error message");
+      expect(screen.getByText("Firebase error message")).toBeInTheDocument();
     });
   });
 });

@@ -21,7 +21,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 // --------------------------------------
 // Replace this with your actual YouTube API key
 // --------------------------------------
-const apiKey = "AIzaSyDBQAU6xAr29VabVv4vZfXj0rvFVoPchKk";
+const apiKey = "AIzaSyC-JBUw-qxNsw1ad_evdCemdQCBw2zCZVc";
 
 // Helper to extract a YouTube video ID from various link formats
 const extractVideoID = (url) => {

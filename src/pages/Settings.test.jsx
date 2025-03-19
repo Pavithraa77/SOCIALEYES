@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import Settings from "../components/Settings";
+import Settings from "../pages/Settings";
 import { getAuth, deleteUser, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 jest.mock("firebase/auth", () => ({
