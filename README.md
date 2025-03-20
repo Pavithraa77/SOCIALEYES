@@ -8,9 +8,9 @@ This project provides an interactive platform for users to view and analyze thei
 
 ## Features
 ### 1. Login
-  ![Select YouTube Platform](src/assets/1.jpg)
+  ![Select YouTube Platform](src/assets/1.png)
 ### 2. Dashboard
-  ![Engagement Metrics](src/assets/2.jpg)
+  ![Engagement Metrics](src/assets/2.png)
 - **Paste YouTube Video Link**: Users can enter a YouTube video link to retrieve analytics and insights.
 
 - **View Video Statistics**: Displays metrics such as views, likes, comments, and watch time for the selected video.
@@ -22,7 +22,7 @@ This project provides an interactive platform for users to view and analyze thei
 ---
 
 ### 3. Analytics
-  ![Scheduled Reports](src/assets/3.jpg)
+  ![Scheduled Reports](src/assets/3.png)
 - **View Engagement Metrics**: Track and view engagement metrics such as views, likes, comments, and overall watch time for the selected video.
 
 - **Analyze Video Trends**: Visualize video performance over time through interactive graphs and detailed data points.
