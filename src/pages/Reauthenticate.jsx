@@ -1,15 +1,26 @@
-import { useState } from "react";
-import { getAuth, reauthenticateWithCredential, EmailAuthProvider, GoogleAuthProvider, signInWithPopup, deleteUser } from "firebase/auth";
+import { useEffect, useState } from "react";
+import {
+  getAuth,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  GoogleAuthProvider,
+  signInWithPopup,
+  deleteUser
+} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import "../css/Reauthenticate.css"; // Import the new CSS
+import "../css/Reauthenticate.css";
 
 const Reauthenticate = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
   const auth = getAuth();
-  const user = auth.currentUser;
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setUser(auth.currentUser); // Ensure user updates dynamically
+  }, [auth]);
 
   const deleteAccount = async () => {
     if (!user) {
@@ -38,7 +49,7 @@ const Reauthenticate = () => {
       const credential = EmailAuthProvider.credential(user.email, password);
       await reauthenticateWithCredential(user, credential);
       alert("🔑 Re-authentication successful. Deleting your account...");
-      deleteAccount(); // Proceed to delete user
+      await deleteAccount(); // Fix: Ensure deleteAccount is awaited
     } catch (error) {
       console.error("Re-authentication failed:", error);
       setError(error.message);
@@ -57,7 +68,7 @@ const Reauthenticate = () => {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       alert("🔑 Re-authentication successful. Deleting your account...");
-      deleteAccount(); // Proceed to delete user
+      await deleteAccount(); // Fix: Ensure deleteAccount is awaited
     } catch (error) {
       console.error("Google Re-authentication failed:", error);
       setError(error.message);
@@ -71,7 +82,7 @@ const Reauthenticate = () => {
       <div className="reauth-card">
         <h2 className="reauth-title">Re-authenticate to Continue</h2>
 
-        {user?.providerData[0]?.providerId === "password" ? (
+        {user?.providerData?.[0]?.providerId === "password" ? (
           <form onSubmit={handleEmailReauth}>
             <input
               type="password"
