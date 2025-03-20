@@ -69,7 +69,7 @@ const Signup = () => {
         {/* Display verification message */}
         {message && <div className="alert alert-success text-center">{message}</div>}
 
-        <form onSubmit={handleSignup}>
+        <form onSubmit={handleSignup} noValidate>
           <div className="mb-3">
             <label className="form-label">Full Name</label>
             <input

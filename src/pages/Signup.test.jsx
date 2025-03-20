@@ -1,85 +1,186 @@
+import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
+import "@testing-library/jest-dom";
 import Signup from "../pages/Signup";
 import { auth } from "../config/firebase";
-import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendEmailVerification,
+} from "firebase/auth";
 
-jest.mock("../config/firebase", () => ({
-  auth: {},
-}));
-
+// Mock Firebase authentication functions
 jest.mock("firebase/auth", () => ({
   createUserWithEmailAndPassword: jest.fn(),
   updateProfile: jest.fn(),
   sendEmailVerification: jest.fn(),
 }));
 
+jest.mock("../config/firebase", () => ({
+  auth: {},
+}));
+
+const MockSignup = () => {
+  return (
+    <BrowserRouter>
+      <Signup />
+    </BrowserRouter>
+  );
+};
+
 describe("Signup Component", () => {
   test("renders signup form", () => {
-    render(
-      <MemoryRouter>
-        <Signup />
-      </MemoryRouter>
-    );
+    render(<MockSignup />);
 
-    expect(screen.getByText(/Sign Up/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Enter your name/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Enter your email/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Create a password/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /sign up/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Enter your name")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Enter your email")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Create a password")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /sign up/i })).toBeInTheDocument();
   });
 
-  test("shows error message if fields are empty on submit", async () => {
-    render(
-      <MemoryRouter>
-        <Signup />
-      </MemoryRouter>
-    );
+  test("shows error message if fields are empty", async () => {
+    render(<MockSignup />);
 
-    fireEvent.click(screen.getByText(/Sign Up/i));
+    fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
 
-    expect(await screen.findByText(/Please fill all fields./i)).toBeInTheDocument();
+    expect(await screen.findByText(/please fill all fields/i)).toBeInTheDocument();
   });
 
-  test("handles successful signup and email verification", async () => {
-    const mockUser = { user: { emailVerified: false, reload: jest.fn() } };
+  test("calls createUserWithEmailAndPassword with correct credentials", async () => {
+    const mockUser = { user: { emailVerified: false } };
     createUserWithEmailAndPassword.mockResolvedValue(mockUser);
-    updateProfile.mockResolvedValue();
-    sendEmailVerification.mockResolvedValue();
 
-    render(
-      <MemoryRouter>
-        <Signup />
-      </MemoryRouter>
-    );
+    render(<MockSignup />);
 
-    fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: "Test User" } });
-    fireEvent.change(screen.getByPlaceholderText(/Enter your email/i), { target: { value: "test@example.com" } });
-    fireEvent.change(screen.getByPlaceholderText(/Create a password/i), { target: { value: "password123" } });
-    fireEvent.click(screen.getByText(/Sign Up/i));
-
-    await waitFor(() => {
-      expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(auth, "test@example.com", "password123");
-      expect(updateProfile).toHaveBeenCalledWith(mockUser.user, { displayName: "Test User" });
-      expect(sendEmailVerification).toHaveBeenCalledWith(mockUser.user);
+    fireEvent.change(screen.getByPlaceholderText("Enter your name"), {
+      target: { value: "John Doe" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Enter your email"), {
+      target: { value: "test@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Create a password"), {
+      target: { value: "password123" },
     });
 
-    expect(await screen.findByText(/A verification email has been sent./i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+
+    await waitFor(() => {
+      expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
+        auth,
+        "test@example.com",
+        "password123"
+      );
+    });
   });
 
-  test("shows error message for existing email", async () => {
+  test("calls updateProfile with correct display name", async () => {
+    const mockUser = { user: { emailVerified: false } };
+    createUserWithEmailAndPassword.mockResolvedValue(mockUser);
+
+    render(<MockSignup />);
+
+    fireEvent.change(screen.getByPlaceholderText("Enter your name"), {
+      target: { value: "John Doe" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Enter your email"), {
+      target: { value: "test@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Create a password"), {
+      target: { value: "password123" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+
+    await waitFor(() => {
+      expect(updateProfile).toHaveBeenCalledWith(mockUser.user, { displayName: "John Doe" });
+    });
+  });
+
+  test("sends email verification", async () => {
+    const mockUser = { user: { emailVerified: false } };
+    createUserWithEmailAndPassword.mockResolvedValue(mockUser);
+
+    render(<MockSignup />);
+
+    fireEvent.change(screen.getByPlaceholderText("Enter your name"), {
+      target: { value: "John Doe" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Enter your email"), {
+      target: { value: "test@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Create a password"), {
+      target: { value: "password123" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+
+    await waitFor(() => {
+      expect(sendEmailVerification).toHaveBeenCalledWith(mockUser.user);
+      expect(
+        screen.getByText(/a verification email has been sent/i)
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("shows error message if email is already in use", async () => {
     createUserWithEmailAndPassword.mockRejectedValue({ code: "auth/email-already-in-use" });
 
-    render(
-      <MemoryRouter>
-        <Signup />
-      </MemoryRouter>
-    );
+    render(<MockSignup />);
 
-    fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: "Test User" } });
-    fireEvent.change(screen.getByPlaceholderText(/Enter your email/i), { target: { value: "test@example.com" } });
-    fireEvent.change(screen.getByPlaceholderText(/Create a password/i), { target: { value: "password123" } });
-    fireEvent.click(screen.getByText(/Sign Up/i));
+    fireEvent.change(screen.getByPlaceholderText("Enter your name"), {
+      target: { value: "John Doe" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Enter your email"), {
+      target: { value: "test@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Create a password"), {
+      target: { value: "password123" },
+    });
 
-    expect(await screen.findByText(/This email is already in use./i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+
+    expect(await screen.findByText(/this email is already in use/i)).toBeInTheDocument();
+  });
+
+  test("shows error message for weak password", async () => {
+    createUserWithEmailAndPassword.mockRejectedValue({ code: "auth/weak-password" });
+
+    render(<MockSignup />);
+
+    fireEvent.change(screen.getByPlaceholderText("Enter your name"), {
+      target: { value: "John Doe" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Enter your email"), {
+      target: { value: "test@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Create a password"), {
+      target: { value: "123" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+
+    expect(await screen.findByText(/password should be at least 6 characters/i)).toBeInTheDocument();
+  });
+
+  test("shows error message for invalid email format", async () => {
+    createUserWithEmailAndPassword.mockRejectedValue({ code: "auth/invalid-email" });
+
+    render(<MockSignup />);
+
+    fireEvent.change(screen.getByPlaceholderText("Enter your name"), {
+      target: { value: "John Doe" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Enter your email"), {
+      target: { value: "invalid-email" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Create a password"), {
+      target: { value: "password123" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+
+    expect(await screen.findByText(/invalid email format/i)).toBeInTheDocument();
   });
 });

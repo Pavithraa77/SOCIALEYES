@@ -15,7 +15,7 @@ const Dashboard = () => {
       {/* Sidebar */}
       <div className="dashboard-sidebar">
         {/* Logo */}
-        <img src={logo} alt="Social Eyes Logo" className="dashboard-logo" />
+        <img src={logo} alt="Social Eyes Logo" className = "dashboard-logo" />
         <h1 className="dashboard-title">Social Eyes</h1>
         <nav className="dashboard-nav">
           {/* YouTube Icon Button */}

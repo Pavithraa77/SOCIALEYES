@@ -107,38 +107,41 @@ function ChangeEmail() {
         {currentUser && <p style={{ color: "#fff" }}>Current email: {currentUser.email}</p>}
 
         <form onSubmit={handleSubmit}>
-          <label className="form-label">New Email</label>
-          <input
-            type="email"
-            placeholder="New email"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
-            className="form-control"
-            required
-          />
+  <label htmlFor="new-email" className="form-label">New Email</label>
+  <input
+    id="new-email"
+    type="email"
+    placeholder="New email"
+    value={newEmail}
+    onChange={(e) => setNewEmail(e.target.value)}
+    className="form-control"
+    required
+  />
 
-          {isEmailUser && (
-            <>
-              <label className="form-label">Current Password</label>
-              <input
-                type="password"
-                placeholder="Current password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="form-control"
-                required
-              />
-            </>
-          )}
+  {isEmailUser && (
+    <>
+      <label htmlFor="current-password" className="form-label">Current Password</label>
+      <input
+        id="current-password"
+        type="password"
+        placeholder="Current password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="form-control"
+        required
+      />
+    </>
+  )}
 
-          <button
-            type="submit"
-            disabled={isUpdating}
-            className="change-email-btn"
-          >
-            {isUpdating ? "Processing..." : "Change Email"}
-          </button>
-        </form>
+  <button
+    type="submit"
+    disabled={isUpdating}
+    className="change-email-btn"
+  >
+    {isUpdating ? "Processing..." : "Change Email"}
+  </button>
+</form>
+
 
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
