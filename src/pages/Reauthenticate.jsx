@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   getAuth,
   reauthenticateWithCredential,
@@ -14,13 +14,10 @@ const Reauthenticate = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const auth = getAuth();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    setUser(auth.currentUser); // Ensure user updates dynamically
-  }, [auth]);
+  const auth = getAuth();
+  const user = auth.currentUser; // ✅ Use this directly
+  const navigate = useNavigate();
 
   const deleteAccount = async () => {
     if (!user) {
@@ -31,7 +28,7 @@ const Reauthenticate = () => {
     try {
       await deleteUser(user);
       alert("✅ Account deleted successfully. Redirecting to login...");
-      navigate("/login"); // Redirect to login page
+      navigate("/login");
     } catch (error) {
       console.error("Account deletion failed:", error);
       setError(error.message);
@@ -40,7 +37,10 @@ const Reauthenticate = () => {
 
   const handleEmailReauth = async (e) => {
     e.preventDefault();
-    if (!user) return setError("No user is logged in.");
+    if (!user) {
+      setError("No user is logged in.");
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -49,7 +49,7 @@ const Reauthenticate = () => {
       const credential = EmailAuthProvider.credential(user.email, password);
       await reauthenticateWithCredential(user, credential);
       alert("🔑 Re-authentication successful. Deleting your account...");
-      await deleteAccount(); // Fix: Ensure deleteAccount is awaited
+      await deleteAccount();
     } catch (error) {
       console.error("Re-authentication failed:", error);
       setError(error.message);
@@ -59,7 +59,10 @@ const Reauthenticate = () => {
   };
 
   const handleGoogleReauth = async () => {
-    if (!user) return setError("No user is logged in.");
+    if (!user) {
+      setError("No user is logged in.");
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -68,7 +71,7 @@ const Reauthenticate = () => {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       alert("🔑 Re-authentication successful. Deleting your account...");
-      await deleteAccount(); // Fix: Ensure deleteAccount is awaited
+      await deleteAccount();
     } catch (error) {
       console.error("Google Re-authentication failed:", error);
       setError(error.message);
