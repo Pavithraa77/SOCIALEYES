@@ -11,31 +11,19 @@ This project provides an interactive platform for users to view and analyze thei
   ![Select YouTube Platform](src/assets/1.png)
 ### 2. Dashboard
   ![Engagement Metrics](src/assets/2.png)
-- **Paste YouTube Video Link**: Users can enter a YouTube video link to retrieve analytics and insights.
 
-- **View Video Statistics**: Displays metrics such as views, likes, comments, and watch time for the selected video.
-
-- **Sync Data**: Fetch the latest data from YouTube and refresh the dashboard for real-time updates.
-
-- **Logout**: Securely log out from the platform to ensure account privacy.
-
----
 
 ### 3. Analytics
   ![Scheduled Reports](src/assets/3.png)
-- **View Engagement Metrics**: Track and view engagement metrics such as views, likes, comments, and overall watch time for the selected video.
-
-- **Analyze Video Trends**: Visualize video performance over time through interactive graphs and detailed data points.
-
-- **Compare Timeframes**: Compare metrics between two different timeframes using tabular or graphical formats.
-
----
 
 ### 4. Enhanced Flexibilities
+![Scheduled Reports](src/assets/4.png)
 
-- **Scheduled Reports**: Schedule periodic reports (daily, weekly, or monthly) in PDF or CSV format, sent to a specified email address.
+### 4. Enhanced Flexibilities
+![Scheduled Reports](src/assets/5.png)
 
-- **Dark Mode Option**: Toggle between light and dark modes for a better visual experience.
+### 4. Enhanced Flexibilities
+![Scheduled Reports](src/assets/6.png)
 
-- **Multi-Language Support**: Select and apply preferred languages for the app interface for personalized user experience.
+
 
