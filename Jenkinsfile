@@ -23,8 +23,7 @@ pipeline {
 
     post {
         always {
-            // Ensure this step runs within a node block
-            node {
+            node('any') {
                 junit '**/jest-results.xml'
             }
         }
