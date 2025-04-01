@@ -2,29 +2,35 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                git 'https://github.com/Pavithraa77/SOCIALEYES.git'
+                git branch: 'main', url: 'https://github.com/your-username/your-repo.git'
             }
         }
-        
+
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                bat 'npm install'
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'npm test -- --coverage'
+                bat 'npm test'
             }
         }
-    }
 
-    post {
-        always {
-            node('any') {
-                junit '**/jest-results.xml'
+        stage('Build React App') {
+            steps {
+                bat 'npm run build'
+            }
+        }
+
+        stage('Deploy to Firebase') {
+            steps {
+                withCredentials([string(credentialsId: 'FIREBASE_TOKEN', variable: 'FIREBASE_TOKEN')]) {
+                    bat 'firebase deploy --token "%FIREBASE_TOKEN%"'
+                }
             }
         }
     }
