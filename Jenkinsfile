@@ -38,11 +38,5 @@ pipeline {
             }
         }
         
-        stage('Deploy to Firebase') {
-            steps {
-                // Ensure FIREBASE_TOKEN is set in Jenkins Environment Variables
-                sh 'firebase deploy --token "$FIREBASE_TOKEN"'
-            }
-        }
     }
 }
