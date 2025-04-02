@@ -1,5 +1,10 @@
 pipeline {
     agent any
+
+    tools {
+        nodejs "NodeJS-18" // Name must match the one you set in Global Tool Configuration
+    }
+    
     stages {
         stage('Clone Repository') {
             steps {
