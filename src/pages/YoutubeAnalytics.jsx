@@ -1,7 +1,7 @@
 // File: YouTubeAnalytics.js
 import React, { useState, useEffect } from "react";
-import * as tf from "@tensorflow/tfjs"; // NEW IMPORT
-import * as useModel from "@tensorflow-models/universal-sentence-encoder"; // NEW IMPORT
+import * as tf from "@tensorflow/tfjs";
+import * as useModel from "@tensorflow-models/universal-sentence-encoder";
 import {
   LineChart,
   Line,
@@ -47,38 +47,30 @@ function EngagementRateChecker({ videoURL }) {
       alert("Please enter a valid date and main video URL above.");
       return;
     }
-
     const videoId = extractVideoID(videoURL);
     const dateObj = new Date(compareDate);
-
     if (!videoId || isNaN(dateObj.getTime())) {
       alert("Please enter a valid date and main video URL above.");
       return;
     }
-
     try {
       const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${apiKey}`;
       let response = await fetch(url);
       let data = await response.json();
-
       if (!data.items || !data.items.length) {
         setResult("Invalid Video URL or No Data Available.");
         return;
       }
-
       let video = data.items[0];
       let publishedAt = new Date(video.snippet.publishedAt);
       let views = parseInt(video.statistics.viewCount || 0, 10);
       let likes = parseInt(video.statistics.likeCount || 0, 10);
       let comments = parseInt(video.statistics.commentCount || 0, 10);
-
       let engagementRate = views > 0 ? ((likes + comments) / views) * 100 : 0;
-
       let engagementBefore =
         publishedAt < dateObj ? `${engagementRate.toFixed(2)}%` : "N/A";
       let engagementAfter =
         publishedAt >= dateObj ? `${engagementRate.toFixed(2)}%` : "N/A";
-
       setResult({
         title: video.snippet.title,
         publishedAt: video.snippet.publishedAt,
@@ -110,7 +102,6 @@ function EngagementRateChecker({ videoURL }) {
           Compare Engagement
         </button>
       </div>
-
       {result && typeof result === "object" && (
         <div className="mt-3" style={{ textAlign: "left" }}>
           <p>
@@ -138,7 +129,6 @@ function EngagementRateChecker({ videoURL }) {
           </p>
         </div>
       )}
-
       {typeof result === "string" && (
         <div className="mt-3">
           <p>{result}</p>
@@ -152,6 +142,7 @@ function EngagementRateChecker({ videoURL }) {
 // Main YouTubeAnalytics Component
 // --------------------------------------
 function YouTubeAnalytics() {
+  // Video and channel data states
   const [videoURL, setVideoURL] = useState("");
   const [channelStats, setChannelStats] = useState(null);
   const [videoStats, setVideoStats] = useState(null);
@@ -176,18 +167,15 @@ function YouTubeAnalytics() {
   const [showPlayer, setShowPlayer] = useState(false);
   const [currentVideoId, setCurrentVideoId] = useState(null);
 
-  // New states for video comparison
+  // States for video comparison
   const [compareVideoURL, setCompareVideoURL] = useState("");
   const [compareVideoData, setCompareVideoData] = useState(null);
   const [compareSentimentData, setCompareSentimentData] = useState([]);
 
-  // New state for storing the single nearest neighbor result
-  const [similarComment, setSimilarComment] = useState(null);
-  // NEW state for storing k-nearest neighbors (top 2) with both technical and semantic details
-  const [kNearestComments, setKNearestComments] = useState({
-    technical: [],
-    semantic: null,
-  });
+  // NEW state: Sorted similar video results using Euclidean distance
+  const [similarVideoEuclideanResults, setSimilarVideoEuclideanResults] = useState([]);
+  // NEW state: List of similar video results from the Bregman ball tree approach
+  const [similarVideoBregmanResults, setSimilarVideoBregmanResults] = useState([]);
 
   // For sentiment analysis
   const sentimentAnalyzer = new Sentiment();
@@ -202,6 +190,7 @@ function YouTubeAnalytics() {
     { id: "sentimentAnalysis", label: "Comment Sentiment Analysis" },
     { id: "compareVideos", label: "Compare Videos" },
     { id: "engagementChecker", label: "Engagement Rate Checker" },
+    { id: "similarVideos", label: "Similar Videos" }
   ];
 
   // Helper to format numbers with commas
@@ -239,7 +228,7 @@ function YouTubeAnalytics() {
     };
   };
 
-  // Fetch main video stats
+  // Fetch main video stats and channel data
   const fetchStatistics = async () => {
     let videoID = extractVideoID(videoURL);
     if (!videoID) {
@@ -252,40 +241,32 @@ function YouTubeAnalytics() {
         `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id=${videoID}&key=${apiKey}`
       );
       let videoData = await videoRes.json();
-
       if (videoData.items && videoData.items.length > 0) {
         let video = videoData.items[0];
-
         setVideoTitle(video.snippet.title);
         setVideoThumbnail(video.snippet.thumbnails.high.url);
         setVideoDuration(formatDuration(video.contentDetails.duration));
         setTrendingTags(video.snippet.tags || []);
-
         const views = parseInt(video.statistics.viewCount, 10);
         const likes = parseInt(video.statistics.likeCount, 10);
         const comments = parseInt(video.statistics.commentCount, 10);
-
         const newStats = {
           time: new Date().toLocaleTimeString(),
           views,
           likes,
           comments,
         };
-
         setVideoStats(video.statistics);
         setStatsHistory((prev) => [...prev, newStats]);
-
         setCommentsPerView(
           views > 0 && comments > 0 ? Math.round(views / comments) : "N/A"
         );
         setEngagementRate(views > 0 ? ((likes + comments) / views).toFixed(4) : "N/A");
-
         let channelID = video.snippet.channelId;
         let channelRes = await fetch(
           `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelID}&key=${apiKey}`
         );
         let channelData = await channelRes.json();
-
         if (channelData.items && channelData.items.length > 0) {
           let channel = channelData.items[0];
           setChannelStats(channel.statistics);
@@ -293,7 +274,6 @@ function YouTubeAnalytics() {
           setChannelProfile(channel.snippet.thumbnails.high.url);
           setTotalVideos(channel.statistics.videoCount);
           setUploadFrequency(calculateUploadFrequency(channel));
-
           // Fetch 4 most viewed videos
           let videosRes = await fetch(
             `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelID}&maxResults=4&order=viewCount&type=video&key=${apiKey}`
@@ -303,12 +283,11 @@ function YouTubeAnalytics() {
             const viewedVideosWithDetails = await Promise.all(
               videosData.items.map(async (vid) => {
                 const details = await fetchVideoDetails(vid.id.videoId);
-                return { ...vid, views: details.views };
+                return { ...vid, views: details.views, likes: details.likes };
               })
             );
             setMostViewedVideos(viewedVideosWithDetails);
           }
-
           // Fetch 4 most liked videos (Highly Rated Videos)
           let likedVideosRes = await fetch(
             `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelID}&maxResults=4&order=rating&type=video&key=${apiKey}`
@@ -342,7 +321,6 @@ function YouTubeAnalytics() {
       return;
     }
     try {
-      // Check cache in localStorage using a key based on videoID
       let cachedComments = localStorage.getItem(`comments_${videoID}`);
       let fetchedComments = [];
       if (cachedComments) {
@@ -357,7 +335,6 @@ function YouTubeAnalytics() {
           fetchedComments = commentsData.items.map(
             (item) => item.snippet.topLevelComment.snippet.textDisplay
           );
-          // Cache the comments for future use
           localStorage.setItem(`comments_${videoID}`, JSON.stringify(fetchedComments));
         } else {
           alert("No comments found for this video.");
@@ -366,7 +343,6 @@ function YouTubeAnalytics() {
         }
       }
       setComments(fetchedComments);
-      // Enrich each comment with additional features:
       const sentimentResults = fetchedComments.map((comment) => {
         const analysis = sentimentAnalyzer.analyze(comment);
         const words = comment.trim().split(/\s+/);
@@ -558,87 +534,64 @@ function YouTubeAnalytics() {
     }
   };
 
-  // Function to demonstrate single nearest neighbor search using Bergman Ball Tree
-  const findSimilarComment = () => {
-    if (sentimentData.length < 2) {
-      alert("Not enough comments to find a similar one.");
+  // NEW FUNCTION: Find similar video using a Euclidean distance metric.
+  // This function uses both view count and like count differences (normalized by the main video's values)
+  const findSimilarVideoEuclidean = () => {
+    if (!videoStats || mostViewedVideos.length === 0) {
+      alert("Not enough data to find a similar video. Please fetch statistics first.");
       return;
     }
-    const features = sentimentData.map((item) => ({
-      ...item,
-      // We are using score and length for simplicity
-      length: item.length,
-    }));
-    const target = features[0];
-    const featuresWithoutTarget = features.slice(1);
-    const tree = new BergmanBallTree(featuresWithoutTarget, (a, b) => {
-      const dScore = a.score - b.score;
-      const dLength = a.length - b.length;
-      return Math.sqrt(dScore * dScore + dLength * dLength);
+    const mainViews = parseFloat(videoStats.viewCount);
+    const mainLikes = parseFloat(videoStats.likeCount);
+    const results = mostViewedVideos.map((candidate) => {
+      const candidateViews = parseFloat(candidate.views) || 0;
+      const candidateLikes = parseFloat(candidate.likes) || 0;
+      const viewDiff = (candidateViews - mainViews) / mainViews;
+      const likeDiff = mainLikes > 0 ? (candidateLikes - mainLikes) / mainLikes : 0;
+      const distance = Math.sqrt(viewDiff * viewDiff + likeDiff * likeDiff);
+      return { candidate, distance };
     });
-    const nearestResult = tree.nearest(target);
-    setSimilarComment(nearestResult);
+    // Sort candidates by distance (lowest first)
+    results.sort((a, b) => a.distance - b.distance);
+    setSimilarVideoEuclideanResults(results);
   };
 
-  // NEW FUNCTION: Semantic similarity calculation using Universal Sentence Encoder
-  const calculateSemanticSimilarity = async (comment1, comment2) => {
-    try {
-      const model = await useModel.load();
-      const embeddings = await model.embed([comment1, comment2]);
-      // Compute cosine similarity by performing matrix multiplication and extracting the off-diagonal element
-      const similarity = tf.matMul(embeddings, embeddings, false, true).dataSync();
-      return similarity[1];
-    } catch (error) {
-      console.error("Error calculating semantic similarity:", error);
-      return null;
-    }
-  };
-
-  // NEW/UPDATED HANDLER: k-NN search for top 2 similar comments (technical and semantic)
-  const handleFindKNearestComments = async () => {
-    if (sentimentData.length < 3) {
-      alert("Need at least 3 comments for comparison");
+  // NEW FUNCTION: Find similar videos using a Bregman-based measure.
+  // Instead of returning only one candidate, this function computes a normalized score for each candidate,
+  // then calculates the squared difference (Bregman divergence for f(x)=x²) relative to the main video.
+  const findSimilarVideoBregman = () => {
+    if (!videoStats || mostViewedVideos.length === 0) {
+      alert("Not enough data to find similar videos. Please fetch statistics first.");
       return;
     }
+    const mainViews = parseFloat(videoStats.viewCount);
+    const mainLikes = parseFloat(videoStats.likeCount);
 
-    // Get technical matches using the existing k-NN approach (excluding the target comment)
-    const technicalResults = findKNearestComments(2);
+    // Define a scoring function: a normalized combination of views and likes.
+    const computeScore = (video) => {
+      const candidateViews = parseFloat(video.views) || 0;
+      const candidateLikes = parseFloat(video.likes) || 0;
+      return (candidateViews / mainViews) + (candidateLikes / mainLikes);
+    };
 
-    // Get semantic similarity between the first comment and the most similar technical match
-    const comment1 = sentimentData[0].comment;
-    const comment2 = technicalResults[0].item.comment;
-    const semanticScore = await calculateSemanticSimilarity(comment1, comment2);
-
-    setKNearestComments({
-      technical: technicalResults,
-      semantic: {
-        score: semanticScore,
-        comment: comment2,
-      },
-    });
-  };
-
-  // k-NN search (technical only) for top k similar comments (excluding target)
-  const findKNearestComments = (k) => {
-    if (sentimentData.length < k + 1) {
-      alert("Not enough comments to find the top " + k + " similar comments.");
-      return;
-    }
-    const features = sentimentData.map((item) => ({
-      ...item,
-      length: item.length,
+    // Compute scores for each candidate video.
+    const candidatesWithScore = mostViewedVideos.map(video => ({
+      ...video,
+      score: computeScore(video)
     }));
-    const target = features[0];
-    const featuresWithoutTarget = features.slice(1);
-    const neighbors = featuresWithoutTarget
-      .map((item) => {
-        const dScore = item.score - target.score;
-        const dLength = item.length - target.length;
-        const distance = Math.sqrt(dScore * dScore + dLength * dLength);
-        return { item, distance };
-      })
-      .sort((a, b) => a.distance - b.distance);
-    return neighbors.slice(0, k);
+
+    // Main video's normalized score will be 2 (i.e. 1+1).
+    const mainScore = 2;
+
+    // Compute the divergence (squared difference) for each candidate.
+    const results = candidatesWithScore.map(video => ({
+      candidate: video,
+      distance: Math.pow(video.score - mainScore, 2)
+    }));
+
+    // Sort candidates by divergence (lowest first)
+    results.sort((a, b) => a.distance - b.distance);
+    setSimilarVideoBregmanResults(results);
   };
 
   // Video Player Modal functions
@@ -766,7 +719,6 @@ function YouTubeAnalytics() {
         value={videoURL}
         onChange={(e) => setVideoURL(e.target.value)}
       />
-
       <div className="d-flex justify-content-center mb-3">
         <button className="btn btn-primary me-2" onClick={fetchStatistics}>
           Show Statistics
@@ -778,7 +730,6 @@ function YouTubeAnalytics() {
           {tracking ? "Stop Tracking" : "Start Real-time Tracking"}
         </button>
       </div>
-
       {channelStats && videoStats && (
         <div className="export-button text-center mb-3">
           <CSVLink
@@ -791,13 +742,11 @@ function YouTubeAnalytics() {
           </CSVLink>
         </div>
       )}
-
       {loading && (
         <div className="text-center spinner-border text-primary mt-3" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
       )}
-
       <div className="card p-3 mb-3">
         <h4 className="text-center">Select Components to Display</h4>
         <DragDropContext onDragEnd={onDragEnd}>
@@ -838,7 +787,6 @@ function YouTubeAnalytics() {
           </Droppable>
         </DragDropContext>
       </div>
-
       {channelStats && videoStats && (
         <div>
           {selectedComponents.includes("channelStats") && (
@@ -869,7 +817,6 @@ function YouTubeAnalytics() {
               </div>
             </div>
           )}
-
           {selectedComponents.includes("videoStats") && (
             <div className="card p-3 text-center d-flex align-items-center justify-content-center">
               <img
@@ -906,7 +853,6 @@ function YouTubeAnalytics() {
               </p>
             </div>
           )}
-
           {selectedComponents.includes("engagementMetrics") && (
             <div className="card mt-4 p-3">
               <h4 className="text-center">Real-Time Engagement Metrics</h4>
@@ -929,7 +875,6 @@ function YouTubeAnalytics() {
               </ResponsiveContainer>
             </div>
           )}
-
           {selectedComponents.includes("mostViewedVideos") && (
             <div className="card mt-4 p-3">
               <h4 className="text-center">Most Viewed Videos</h4>
@@ -957,7 +902,6 @@ function YouTubeAnalytics() {
               </div>
             </div>
           )}
-
           {selectedComponents.includes("mostRatedVideos") && (
             <div className="card mt-4 p-3">
               <h4 className="text-center">Highly Rated Videos</h4>
@@ -985,7 +929,6 @@ function YouTubeAnalytics() {
               </div>
             </div>
           )}
-
           {selectedComponents.includes("sentimentAnalysis") && (
             <div className="card mt-4 p-3">
               <h4 className="text-center">Comment Sentiment Analysis</h4>
@@ -1000,67 +943,8 @@ function YouTubeAnalytics() {
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
-              {/* NEW block to display target comment */}
-              {sentimentData[0] && (
-                <div className="card p-2 mt-3">
-                  <h5>Target Comment</h5>
-                  <p>{sentimentData[0].comment}</p>
-                </div>
-              )}
-              {/* Existing button for single nearest neighbor */}
-              <button className="btn btn-info mt-3" onClick={findSimilarComment}>
-                Find Similar Comment to First Comment
-              </button>
-              {similarComment && (
-                <div className="mt-2">
-                  <p>
-                    <strong>Nearest Comment:</strong> {similarComment.point.comment}
-                  </p>
-                  <p>
-                    <strong>Distance:</strong> {similarComment.dist.toFixed(2)}
-                  </p>
-                </div>
-              )}
-              {/* NEW button for k-NN search (top 2 neighbors with semantic analysis) */}
-              <button className="btn btn-warning mt-3" onClick={handleFindKNearestComments}>
-                Find Top 2 Similar Comments
-              </button>
-              {kNearestComments.technical.length > 0 && (
-                <div className="mt-4">
-                  <h5>Technical Similarity (Pattern Matching)</h5>
-                  {kNearestComments.technical.map((neighbor, index) => (
-                    <div key={index} className="card mb-2 p-2">
-                      <p>
-                        <strong>Comment {index + 1}:</strong> {neighbor.item.comment}
-                      </p>
-                      <p>
-                        <strong>Technical Distance:</strong> {neighbor.distance.toFixed(2)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {kNearestComments.semantic && (
-                <div className="mt-4">
-                  <h5>Semantic Similarity (Meaning Analysis)</h5>
-                  <div className="card p-2">
-                    <p>
-                      <strong>Semantic Match Score:</strong>{" "}
-                      {kNearestComments.semantic.score?.toFixed(2)}
-                    </p>
-                    <p>
-                      <strong>Most Similar Comment:</strong>{" "}
-                      {kNearestComments.semantic.comment}
-                    </p>
-                    <p className="text-muted small">
-                      (0 = Completely Different, 1 = Identical Meaning)
-                    </p>
-                  </div>
-                </div>
-              )}
             </div>
           )}
-
           {selectedComponents.includes("compareVideos") && (
             <div className="card mt-4 p-3">
               <h4 className="text-center">Compare Videos</h4>
@@ -1146,13 +1030,82 @@ function YouTubeAnalytics() {
               )}
             </div>
           )}
+          {/* NEW COMPONENT: Similar Videos */}
+          {selectedComponents.includes("similarVideos") && (
+            <div className="card mt-4 p-3">
+              <h4 className="text-center">Similar Videos</h4>
+              <p className="text-center">
+                These features find candidate videos from the most viewed list using different similarity measures.
+              </p>
+              <div className="text-center mb-3">
+                <button className="btn btn-warning me-2" onClick={findSimilarVideoEuclidean}>
+                  Find Similar Videos (Euclidean)
+                </button>
+                <button className="btn btn-secondary" onClick={findSimilarVideoBregman}>
+                  Find Similar Videos (Bregman)
+                </button>
+              </div>
+              {similarVideoEuclideanResults.length > 0 && (
+                <div className="mt-3">
+                  <h5 className="text-center">Euclidean Candidates (sorted by distance)</h5>
+                  <div className="d-flex flex-wrap justify-content-center">
+                    {similarVideoEuclideanResults.map((result) => (
+                      <div
+                        key={result.candidate.id.videoId}
+                        className="card m-2"
+                        style={{ width: "200px", cursor: "pointer" }}
+                        onClick={() => handleVideoClick(result.candidate.id.videoId)}
+                      >
+                        <img
+                          src={result.candidate.snippet.thumbnails.medium.url}
+                          alt="Thumbnail"
+                          className="card-img-top"
+                        />
+                        <div className="card-body">
+                          <p className="card-text">{result.candidate.snippet.title}</p>
+                          <p className="card-text">
+                            <strong>Distance:</strong> {result.distance.toFixed(4)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {similarVideoBregmanResults.length > 0 && (
+                <div className="mt-3">
+                  <h5 className="text-center">Bregman Candidates (sorted by divergence)</h5>
+                  <div className="d-flex flex-wrap justify-content-center">
+                    {similarVideoBregmanResults.map((result) => (
+                      <div
+                        key={result.candidate.id.videoId}
+                        className="card m-2"
+                        style={{ width: "200px", cursor: "pointer" }}
+                        onClick={() => handleVideoClick(result.candidate.id.videoId)}
+                      >
+                        <img
+                          src={result.candidate.snippet.thumbnails.medium.url}
+                          alt="Thumbnail"
+                          className="card-img-top"
+                        />
+                        <div className="card-body">
+                          <p className="card-text">{result.candidate.snippet.title}</p>
+                          <p className="card-text">
+                            <strong>Divergence:</strong> {result.distance.toFixed(4)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
-
       {selectedComponents.includes("engagementChecker") && (
         <EngagementRateChecker videoURL={videoURL} />
       )}
-
       {showPlayer && currentVideoId && (
         <div
           className="video-modal"
@@ -1213,4 +1166,3 @@ function YouTubeAnalytics() {
 }
 
 export default YouTubeAnalytics;
-  
