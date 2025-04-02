@@ -26,7 +26,7 @@ pipeline {
         stage('Build React App') {
             steps {
                 // Assuming 'npm run dev' is what you want; adjust if needed
-                sh 'npm run dev'
+                sh 'npm run build'
             }
         }
         stage('Deploy to Firebase') {
