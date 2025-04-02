@@ -3,27 +3,31 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Pavithraa77/SOCIALEYES.git'
+                // Explicitly specify the main branch
+                git branch: 'main', url: 'https://github.com/Pavithraa77/SOCIALEYES.git'
             }
         }
         stage('Install Dependencies') {
             steps {
-                bat 'npm install'
+                // Use sh for macOS/Linux
+                sh 'npm install'
             }
         }
         stage('Run Tests') {
             steps {
-                bat 'npm test'
+                sh 'npm test'
             }
         }
         stage('Build React App') {
             steps {
-                bat 'npm run dev'
+                // Assuming 'npm run dev' is what you want; adjust if needed
+                sh 'npm run dev'
             }
         }
         stage('Deploy to Firebase') {
             steps {
-                bat 'firebase deploy --token "$FIREBASE_TOKEN"'
+                // Deploy to Firebase using the environment variable FIREBASE_TOKEN
+                sh 'firebase deploy --token "$FIREBASE_TOKEN"'
             }
         }
     }
