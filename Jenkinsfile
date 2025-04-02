@@ -8,8 +8,7 @@ pipeline {
         }
         stage('Install Dependencies') {
             steps {
-                bat 'npm cache clean --force'
-                bat 'npm install --legacy-peer-deps'
+                bat 'npm install'
             }
         }
         stage('Run Tests') {
@@ -19,12 +18,12 @@ pipeline {
         }
         stage('Build React App') {
             steps {
-                bat 'npm run build'
+                bat 'npm run dev'
             }
         }
         stage('Deploy to Firebase') {
             steps {
-                bat 'firebase deploy --token "$FIREBASE_DEPLOY_TOKEN"'
+                bat 'firebase deploy --token "$FIREBASE_TOKEN"'
             }
         }
     }
