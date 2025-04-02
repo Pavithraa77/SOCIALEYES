@@ -53,12 +53,6 @@
     "jest-junit": "^16.0.0",
     "vite": "^6.1.0",
     "vitest": "^3.0.9"
-  },
-  "jest": {
-    "reporters": [
-        "default",
-        ["jest-junit", { "outputDirectory": ".", "outputName": "jest-report.xml" }]
-    ]
-}
+  }
 
 }
