@@ -4,10 +4,11 @@ pipeline {
     tools {
         nodejs "NodeJS-18" // Name must match the one set in Global Tool Configuration
     }
-
+    
     stages {
         stage('Clone Repository') {
             steps {
+                // Explicitly specify the main branch
                 git branch: 'main', url: 'https://github.com/Pavithraa77/SOCIALEYES.git'
             }
         }
@@ -27,12 +28,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh 'npm test -- --ci --reporters=default --reporters=jest-junit'
-            }
-            post {
-                always {
-                    junit 'jest-report.xml'  // Archive Jest test results
-                }
+                sh 'npm test'
             }
         }
         
@@ -41,11 +37,6 @@ pipeline {
                 sh 'npm run build'
             }
         }
-    }
-
-    post {
-        always {
-            archiveArtifacts artifacts: 'jest-report.xml', fingerprint: true
-        }
+        
     }
 }
