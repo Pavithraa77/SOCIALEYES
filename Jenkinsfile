@@ -18,6 +18,20 @@ pipeline {
                 sh 'npm install'
             }
         }
+
+        stage('Install Firebase CLI') {
+            steps {
+                sh 'npm install -g firebase-tools'
+                sh 'firebase --version'
+            }
+        }
+
+        stage('Deploy to Firebase') {
+            steps {
+                sh 'firebase deploy --token "your_token_here"'
+            }
+        }
+        
         stage('Run Tests') {
             steps {
                 sh 'npm test'
