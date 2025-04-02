@@ -1,7 +1,6 @@
 // File: YouTubeAnalytics.js
 import React, { useState, useEffect } from "react";
-import * as tf from "@tensorflow/tfjs";
-import * as useModel from "@tensorflow-models/universal-sentence-encoder";
+
 import {
   LineChart,
   Line,
