@@ -49,72 +49,73 @@
 ---
 
 ## Screenshots of the all the features
-1. **Landing Page**  
-   ![Landing Page](src/assets/landingpage.png)
+
+### 1. Landing Page
+<img src="src/assets/landingpage.png" alt="Landing Page" width="100%" />
 
 <table width="100%">
   <tr>
-    <td width="50%" align="center">
-      2. **Signup Page**  
-      ![Signup Page](src/assets/signup.png)
+    <td width="50%">
+      <h4>2. Signup Page</h4>
+      <img src="src/assets/signup.png" alt="Signup Page" width="100%" />
     </td>
-    <td width="50%" align="center">
-      3. **Login Page**  
-      ![Login Page](src/assets/login.png)
+    <td width="50%">
+      <h4>3. Login Page</h4>
+      <img src="src/assets/login.png" alt="Login Page" width="100%" />
     </td>
   </tr>
 </table>
 
 <table width="100%">
   <tr>
-    <td width="50%" align="center">
-      4. **Dashboard**  
-      ![Dashboard](src/assets/dashboard.png)
+    <td width="50%">
+      <h4>4. Dashboard</h4>
+      <img src="src/assets/dashboard.png" alt="Dashboard" width="100%" />
     </td>
-    <td width="50%" align="center">
-      5. **Settings**  
-      ![Settings Page](src/assets/settings.png)
+    <td width="50%">
+      <h4>5. Settings Page</h4>
+      <img src="src/assets/settings.png" alt="Settings" width="100%" />
     </td>
   </tr>
 </table>
 
 <table width="100%">
   <tr>
-    <td width="50%" align="center">
-      6. **Channel Stats**  
-      ![Channel Stats](src/assets/channelstats.png)
+    <td width="50%">
+      <h4>6. Channel Stats</h4>
+      <img src="src/assets/channelstats.png" alt="Channel Stats" width="100%" />
     </td>
-    <td width="50%" align="center">
-      7. **Video Stats**  
-      ![Video Stats](src/assets/videostats.png)
+    <td width="50%">
+      <h4>7. Video Stats</h4>
+      <img src="src/assets/videostats.png" alt="Video Stats" width="100%" />
     </td>
   </tr>
 </table>
 
-8. **Compare Videos**  
-   ![Compare Videos](src/assets/comparevideos.png)
+### 8. Compare Videos
+<img src="src/assets/comparevideos.png" alt="Compare Videos" width="100%" />
 
-9. **Comment Sentiment Analysis**  
-   ![Comment Sentiment Analysis](src/assets/comment-sentimentanalysis.png)
+### 9. Comment Sentiment Analysis
+<img src="src/assets/comment-sentimentanalysis.png" alt="Comment Sentiment Analysis" width="100%" />
 
-10. **Engagement Rate Checker**  
-    ![Engagement Rate Checker](src/assets/engagement-rate-checker.png)
+### 10. Engagement Rate Checker
+<img src="src/assets/engagement-rate-checker.png" alt="Engagement Rate Checker" width="100%" />
 
 <table width="100%">
   <tr>
-    <td width="50%" align="center">
-      11. **Embedded YouTube Videos**  
-      ![Embedded Videos](src/assets/embedded-utube-videos.png)
+    <td width="50%">
+      <h4>11. Embedded YouTube Videos</h4>
+      <img src="src/assets/embedded-utube-videos.png" alt="Embedded YouTube Videos" width="100%" />
     </td>
-    <td width="50%" align="center">
-      12. **Most Viewed & Highly Rated Videos**  
-      ![Most Viewed & Highly Rated](src/assets/mostviewed-highlyrated.png)
+    <td width="50%">
+      <h4>12. Most Viewed & Highly Rated Videos</h4>
+      <img src="src/assets/mostviewed-highlyrated.png" alt="Most Viewed & Highly Rated" width="100%" />
     </td>
   </tr>
 </table>
 
-13. **Similar Videos (Bregman & Euclidean)**  
-    ![Similar Videos](src/assets/similarvideos-bregman-euclidean.png)
+### 13. Similar Videos (Bregman & Euclidean)
+<img src="src/assets/similarvideos-bregman-euclidean.png" alt="Similar Videos" width="100%" />
 
 ---
 
