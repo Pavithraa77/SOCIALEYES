@@ -8,7 +8,7 @@ An interactive platform that empowers content creators to monitor, analyze, and 
 
 ---
 
-## 🚀 Features
+## Features
 
 - **Comprehensive Dashboard**: Visualize key metrics such as views, likes, comments, and engagement rates.
 - **Performance Analysis**: Compare video performance across different timeframes to identify trends.
@@ -21,17 +21,30 @@ An interactive platform that empowers content creators to monitor, analyze, and 
 
 ---
 
-## 🖼️ Screenshots
+## Screenshots
 
-![Dashboard Overview](./screenshots/dashboard-overview.png)  
-![Login Page](./screenshots/login-page.png)  
-![Scheduled Reports](./screenshots/scheduled-reports.png)
+
+### 1. Dashboard
+<img src="src/assets/1.png" alt="Scheduled Reports" width="100%">
+
+### 2.Login/Signup 
+<div style="display: flex; gap: 10px;">
+  <img src="src/assets/2.png" alt="Select YouTube Platform" width="48%">
+  <img src="src/assets/3.png" alt="Engagement Metrics" width="48%">
+</div>
+
+<img src="src/assets/4.png" alt="Scheduled Reports" width="100%">
+### 3. Enhanced Flexibilities
+<div style="display: flex; gap: 10px;">
+  <img src="src/assets/5.png" alt="Select YouTube Platform" width="48%">
+  <img src="src/assets/6.png" alt="Engagement Metrics" width="48%">
+</div>
 
 *Note: Replace the above image paths with actual screenshots from your project.*
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: React.js, Vite, Tailwind CSS
 - **Backend**: Node.js, Express.js
@@ -45,7 +58,7 @@ An interactive platform that empowers content creators to monitor, analyze, and 
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 1. **Clone the repository**:
    ```bash
@@ -69,7 +82,7 @@ An interactive platform that empowers content creators to monitor, analyze, and 
 
 ---
 
-## 📦 Deployment
+## Deployment
 
 To deploy the application, consider using platforms like Vercel, Netlify, or Heroku:
 
@@ -83,7 +96,7 @@ To deploy the application, consider using platforms like Vercel, Netlify, or Her
 
 ---
 
-## 🧪 Running Tests
+## Running Tests
 
 The project utilizes Jest for testing:
 
