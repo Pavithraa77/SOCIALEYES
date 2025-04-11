@@ -49,18 +49,73 @@
 ---
 
 ## Screenshots of the all the features
+1. **Landing Page**  
+   ![Landing Page](src/assets/landingpage.png)
 
-Landing Page
+<table width="100%">
+  <tr>
+    <td width="50%" align="center">
+      2. **Signup Page**  
+      ![Signup Page](src/assets/signup.png)
+    </td>
+    <td width="50%" align="center">
+      3. **Login Page**  
+      ![Login Page](src/assets/login.png)
+    </td>
+  </tr>
+</table>
 
-<table width="100%"> <tr> <td width="50%" align="center"> 2. **Signup Page** ![Signup Page](src/assets/signup.png) </td> <td width="50%" align="center"> 3. **Login Page** ![Login Page](src/assets/login.png) </td> </tr> </table> <table width="100%"> <tr> <td width="50%" align="center"> 4. **Dashboard** ![Dashboard](src/assets/dashboard.png) </td> <td width="50%" align="center"> 5. **Settings** ![Settings Page](src/assets/settings.png) </td> </tr> </table> <table width="100%"> <tr> <td width="50%" align="center"> 6. **Channel Stats** ![Channel Stats](src/assets/channelstats.png) </td> <td width="50%" align="center"> 7. **Video Stats** ![Video Stats](src/assets/videostats.png) </td> </tr> </table>
-Compare Videos
+<table width="100%">
+  <tr>
+    <td width="50%" align="center">
+      4. **Dashboard**  
+      ![Dashboard](src/assets/dashboard.png)
+    </td>
+    <td width="50%" align="center">
+      5. **Settings**  
+      ![Settings Page](src/assets/settings.png)
+    </td>
+  </tr>
+</table>
 
-Comment Sentiment Analysis
+<table width="100%">
+  <tr>
+    <td width="50%" align="center">
+      6. **Channel Stats**  
+      ![Channel Stats](src/assets/channelstats.png)
+    </td>
+    <td width="50%" align="center">
+      7. **Video Stats**  
+      ![Video Stats](src/assets/videostats.png)
+    </td>
+  </tr>
+</table>
 
-Engagement Rate Checker
+8. **Compare Videos**  
+   ![Compare Videos](src/assets/comparevideos.png)
 
-<table width="100%"> <tr> <td width="50%" align="center"> 11. **Embedded YouTube Videos** ![Embedded Videos](src/assets/embedded-utube-videos.png) </td> <td width="50%" align="center"> 12. **Most Viewed & Highly Rated Videos** ![Most Viewed & Highly Rated](src/assets/mostviewed-highlyrated.png) </td> </tr> </table>
-Similar Videos (Bregman & Euclidean)
+9. **Comment Sentiment Analysis**  
+   ![Comment Sentiment Analysis](src/assets/comment-sentimentanalysis.png)
+
+10. **Engagement Rate Checker**  
+    ![Engagement Rate Checker](src/assets/engagement-rate-checker.png)
+
+<table width="100%">
+  <tr>
+    <td width="50%" align="center">
+      11. **Embedded YouTube Videos**  
+      ![Embedded Videos](src/assets/embedded-utube-videos.png)
+    </td>
+    <td width="50%" align="center">
+      12. **Most Viewed & Highly Rated Videos**  
+      ![Most Viewed & Highly Rated](src/assets/mostviewed-highlyrated.png)
+    </td>
+  </tr>
+</table>
+
+13. **Similar Videos (Bregman & Euclidean)**  
+    ![Similar Videos](src/assets/similarvideos-bregman-euclidean.png)
+
 ---
 
 ## Tech Stack
