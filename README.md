@@ -1,14 +1,10 @@
-Below is an **enhanced README** that references the newly provided screenshots (located in `src/assets`) and includes a brief folder-structure overview. Feel free to tailor filenames or descriptions to reflect your project precisely.
-
----
-
 # SOCIALEYES – Social Media Dashboard Application
 
 **SOCIALEYES** is an interactive YouTube analytics platform that empowers content creators to monitor, analyze, and optimize their video performance through a dynamic dashboard. It leverages both the **YouTube Data API** and **YouTube Analytics API** (via Google Cloud) to fetch real-time data. Agile project management is ensured by using **Jira** to track user stories and sprints.
 
 ---
 
-## 🚀 Features
+##Key Features
 
 - **Comprehensive Dashboard**  
   - **Channel & Video Stats**: Displays essential channel data (subscribers, total videos, total views, upload frequency) and key video metrics (views, likes, comments, duration, trending tags).  
@@ -25,20 +21,20 @@ Below is an **enhanced README** that references the newly provided screenshots (
   - **Similar Videos (Bregman-Based)**:
     ### 📚 Bergman Ball Trees & Similarity Search
 
-### Purpose of Similarity Searches
-
-SOCIALEYES introduces a feature to find “similar videos” by comparing metrics (views, likes) either via **Euclidean distance** or **Bregman divergence**. These methods identify videos that closely resemble the “main video” in terms of performance and engagement.
-
-### Why Bergman Ball Trees?
-
-A **Bergman Ball Tree** is a specialized data structure engineered to optimize nearest-neighbor searches under **Bregman divergences**. Traditional ball trees work well in Euclidean spaces, but Bregman ball trees cater to non-Euclidean distance metrics. Key benefits include:
-
-- **Optimized Nearest-Neighbor**: Quickly locates the most similar items among a large dataset without exhaustive comparisons.  
-- **Scalability**: As the database of videos grows, Bergman ball trees allow SOCIALEYES to maintain speedy response times for similarity queries.  
-- **Non-Euclidean Metrics**: Many real-world similarity measures (like Bregman divergences) do not obey traditional Euclidean geometry. Bergman ball trees adapt to these scenarios.
-
-While the full Bergman ball tree implementation may evolve over time, the structured approach allows for robust and efficient recommendation features as your dataset scales.
-
+    ### Purpose of Similarity Searches
+    
+    SOCIALEYES introduces a feature to find “similar videos” by comparing metrics (views, likes) either via **Euclidean distance** or **Bregman divergence**. These methods identify videos that closely resemble the “main video” in terms of performance and engagement.
+    
+    ### Why Bergman Ball Trees?
+    
+    A **Bergman Ball Tree** is a specialized data structure engineered to optimize nearest-neighbor searches under **Bregman divergences**. Traditional ball trees work well in Euclidean spaces, but Bregman ball trees cater to non-Euclidean distance metrics. Key benefits include:
+    
+    - **Optimized Nearest-Neighbor**: Quickly locates the most similar items among a large dataset without exhaustive comparisons.  
+    - **Scalability**: As the database of videos grows, Bergman ball trees allow SOCIALEYES to maintain speedy response times for similarity queries.  
+    - **Non-Euclidean Metrics**: Many real-world similarity measures (like Bregman divergences) do not obey traditional Euclidean geometry. Bergman ball trees adapt to these scenarios.
+    
+    While the full Bergman ball tree implementation may evolve over time, the structured approach allows for robust and efficient recommendation features as your dataset scales.
+    
 - **Customizable Interface**  
   - **Component Selection & Drag-and-Drop**: Users can choose which metrics to display and reorder them via drag-and-drop for a personalized dashboard.  
   - **Dark Mode & Multilingual Support**: Improves user experience with theme toggling and multi-language capabilities.  
@@ -106,7 +102,7 @@ The following screenshots (found in `src/assets`) illustrate various features an
 - **Visualization**: Recharts (LineChart, BarChart, PieChart, etc.)  
 - **Data Processing**: Sentiment (comment sentiment analysis)  
 - **Drag-and-Drop**: @hello-pangea/dnd  
-- **Testing & Deployment**: Jest, React Testing Library, Jenkins  
+- **Testing & Deployment**: Jest, Jenkins  
 - **Project Management**: Jira for tracking user stories and sprints  
 - **Version Control**: Git, GitHub  
 
@@ -134,7 +130,7 @@ The following screenshots (found in `src/assets`) illustrate various features an
 
 ---
 
-## 📦 Deployment
+## Deployment
 
 For production or public usage, consider deploying to services like Vercel, Netlify, or Heroku:
 
@@ -144,11 +140,10 @@ For production or public usage, consider deploying to services like Vercel, Netl
    ```
 2. **Deploy the contents of the `dist` folder** to your chosen platform.
 
-Consult the respective platform's documentation for detailed deployment instructions.
 
 ---
 
-## 🧪 Running Tests
+## Running Tests
 
 The project employs **Jest** for automated testing:
 
@@ -160,7 +155,5 @@ The project employs **Jest** for automated testing:
   ```bash
   npm test -- --watch
   ```
-Ensure your test files are in the correct directories and adhere to naming conventions.
-
 ---
 
