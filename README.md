@@ -4,7 +4,7 @@
 
 ---
 
-##Key Features
+## Key Features
 
 - **Comprehensive Dashboard**  
   - **Channel & Video Stats**: Displays essential channel data (subscribers, total videos, total views, upload frequency) and key video metrics (views, likes, comments, duration, trending tags).  
@@ -48,7 +48,7 @@
 
 ---
 
-## 🖼️ Screenshots
+## Screenshots
 
 The following screenshots (found in `src/assets`) illustrate various features and pages:
 
@@ -93,7 +93,7 @@ The following screenshots (found in `src/assets`) illustrate various features an
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: React.js, Vite, Tailwind CSS  
 - **Backend**: Node.js, Express.js  
@@ -108,7 +108,7 @@ The following screenshots (found in `src/assets`) illustrate various features an
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 1. **Clone the repository**:
    ```bash
