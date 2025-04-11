@@ -19,7 +19,7 @@
   - **Compare Videos**: Enables side-by-side comparison of two videos’ key metrics (views, likes, comments) as well as sentiment data.  
   - **Similar Videos (Euclidean Distance)**: Evaluates similarity by normalizing differences in view and like counts.  
   - **Similar Videos (Bregman-Based)**:
-    ### 📚 Bergman Ball Trees & Similarity Search
+    ### Bergman Ball Trees & Similarity Search
 
     ### Purpose of Similarity Searches
     
@@ -48,49 +48,19 @@
 
 ---
 
-## Screenshots
+## Screenshots of the all the features
 
-The following screenshots (found in `src/assets`) illustrate various features and pages:
+Landing Page
 
-1. **Landing Page**  
-   ![Landing Page](src/assets/landingpage.png)
+<table width="100%"> <tr> <td width="50%" align="center"> 2. **Signup Page** ![Signup Page](src/assets/signup.png) </td> <td width="50%" align="center"> 3. **Login Page** ![Login Page](src/assets/login.png) </td> </tr> </table> <table width="100%"> <tr> <td width="50%" align="center"> 4. **Dashboard** ![Dashboard](src/assets/dashboard.png) </td> <td width="50%" align="center"> 5. **Settings** ![Settings Page](src/assets/settings.png) </td> </tr> </table> <table width="100%"> <tr> <td width="50%" align="center"> 6. **Channel Stats** ![Channel Stats](src/assets/channelstats.png) </td> <td width="50%" align="center"> 7. **Video Stats** ![Video Stats](src/assets/videostats.png) </td> </tr> </table>
+Compare Videos
 
-2. **Signup Page**  
-   ![Signup Page](src/assets/signup.png)
+Comment Sentiment Analysis
 
-3. **Login Page**  
-   ![Login Page](src/assets/login.png)
+Engagement Rate Checker
 
-4. **Dashboard**  
-   ![Dashboard](src/assets/dashboard.png)
-
-5. **Settings**  
-   ![Settings Page](src/assets/settings.png)
-
-6. **Channel Stats**  
-   ![Channel Stats](src/assets/channelstats.png)
-
-7. **Video Stats**  
-   ![Video Stats](src/assets/videostats.png)
-
-8. **Compare Videos**  
-   ![Compare Videos](src/assets/comparevideos.png)
-
-9. **Comment Sentiment Analysis**  
-   ![Comment Sentiment Analysis](src/assets/comment-sentimentanalysis.png)
-
-10. **Engagement Rate Checker**  
-    ![Engagement Rate Checker](src/assets/engagement-rate-checker.png)
-
-11. **Embedded YouTube Videos**  
-    ![Embedded Videos](src/assets/embedded-utube-videos.png)
-
-12. **Most Viewed & Highly Rated Videos**  
-    ![Most Viewed & Highly Rated](src/assets/mostviewed-highlyrated.png)
-
-13. **Similar Videos (Bregman & Euclidean)**  
-    ![Similar Videos](src/assets/similarvideos-bregman-euclidean.png)
-
+<table width="100%"> <tr> <td width="50%" align="center"> 11. **Embedded YouTube Videos** ![Embedded Videos](src/assets/embedded-utube-videos.png) </td> <td width="50%" align="center"> 12. **Most Viewed & Highly Rated Videos** ![Most Viewed & Highly Rated](src/assets/mostviewed-highlyrated.png) </td> </tr> </table>
+Similar Videos (Bregman & Euclidean)
 ---
 
 ## Tech Stack
