@@ -1,9 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../css/main.css"; // Import the CSS file
+import "../css/main.css"; 
 import logo from "../assets/Logo.jpg"; 
-
 const Main = () => {
   const navigate = useNavigate();
 
@@ -16,13 +15,13 @@ const Main = () => {
       />
       <h1 className="title">SocialEyes</h1>
       <div className="button-container">
-    <button className="btn btn-login" onClick={() => navigate("/login")}>
-        Login
-    </button>
-    <button className="btn btn-signup" onClick={() => navigate("/signup")}>
-        Signup
-    </button>
-</div>
+        <button className="btn btn-login" onClick={() => navigate("/login")}>
+          Login
+        </button>
+        <button className="btn btn-signup" onClick={() => navigate("/signup")}>
+          Signup
+        </button>
+      </div>
     </div>
   );
 };
