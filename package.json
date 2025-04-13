@@ -1,10 +1,19 @@
 {
+  "homepage": "https://Pavithraa77.github.io/SOCIALEYES/",
   "name": "youtubeanalytics",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:fix": "eslint --fix .",
+    "lint:check": "eslint .",
+    "lint:check:fix": "eslint --fix .",
+    "lint:check:fix:all": "eslint --fix .",   
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -54,5 +63,4 @@
     "vite": "^6.1.0",
     "vitest": "^3.0.9"
   }
-
 }
